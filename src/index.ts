@@ -90,6 +90,11 @@ const network = new Network(plotsystemDatabase, networkDatabase);
   Joi,
   network
 );
+(await import("./routes/general/GET_Countries.js")).initRoutes(
+    router,
+    Joi,
+    network
+);
 
 
 // Init POST Routes for the API
