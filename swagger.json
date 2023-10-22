@@ -440,6 +440,20 @@
           }
         }
       }
+    },
+    "/api/teams/countries": {
+      "get": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Get Countries",
+        "description": "Get a list of all countries along with their Build Team.",
+        "responses": {
+          "400": {
+            "description": "No countries found."
+          }
+        }
+      }
     }
   }
 }
