@@ -50,6 +50,11 @@ const network = new Network(plotsystemDatabase, networkDatabase);
   Joi,
   network
 );
+(await import("./routes/teams/GET_Countries.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
 (await import("./routes/teams/GET_Team.js")).initRoutes(
   router,
   Joi,
@@ -89,11 +94,6 @@ const network = new Network(plotsystemDatabase, networkDatabase);
   router,
   Joi,
   network
-);
-(await import("./routes/general/GET_Countries.js")).initRoutes(
-    router,
-    Joi,
-    network
 );
 
 

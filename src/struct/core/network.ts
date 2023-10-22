@@ -4,9 +4,13 @@ import DatabaseHandler from "../database.js";
 import ProgressBar from "progress";
 import express from "express";
 import joi from "joi";
+import fs from 'fs/promises';
+import path from 'path';
 
 export default class Network {
     private static readonly API_KEY_UPDATE_INTERVAL: number = 10; // 10 minutes
+
+    private static readonly COUNTRY_TEAMS_LIST_UPDATE_INTERVAL: number = 60 * 1; // 1 hour
 
     private plotsystemDatabase: DatabaseHandler;
     private networkDatabase: DatabaseHandler;
@@ -14,6 +18,8 @@ export default class Network {
     private apiKeys: any[] | null = null;
     private buildTeams = new Map();
     private plotSystem: PlotSystem;
+
+    private countryTeamsList: any | null = null;
 
     private updateCacheTicks: number = 0;
 
@@ -49,6 +55,9 @@ export default class Network {
 
 
         // Update the cache for all modules
+
+        if(this.countryTeamsList != null && this.getUpdateCacheTicks() % Network.COUNTRY_TEAMS_LIST_UPDATE_INTERVAL == 0)
+            this.countryTeamsList = null;
 
         this.plotSystem.updateCache();
 
@@ -109,6 +118,44 @@ export default class Network {
         return buildTeam;
     }
 
+    /** Returns information about the build team. **/
+    async getCountryTeamsList(){
+        if(this.countryTeamsList == null)
+            this.countryTeamsList = await this.getCountryTeamsListFromDatabase();
+
+        if(this.countryTeamsList == null)
+            return null;
+
+        // Read the countries.json file
+        const filePath = path.join(process.cwd(), 'lib', 'countries.json');
+        const rawData = await fs.readFile(filePath, 'utf-8');
+        const countriesData = JSON.parse(rawData);
+
+        let countryTeamsListCopy = JSON.parse(JSON.stringify(this.countryTeamsList));
+
+
+        for (const country of countryTeamsListCopy) 
+        for (const countryData of countriesData) 
+            if(countryData.cca3 == country.RegionCode){
+
+                // Add the parameters "cca2", "ccn3", "cioc", "region", "subregion", "capital", "languages", "latlng", "area", "borders" to the countryTeamsListCopy
+                country.cca2 = countryData.cca2;
+                country.ccn3 = countryData.ccn3;
+                country.cioc = countryData.cioc;
+                country.region = countryData.region;
+                country.subregion = countryData.subregion;
+                country.capital = countryData.capital;
+                country.languages = countryData.languages;
+                country.latlng = countryData.latlng;
+                country.area = countryData.area;
+                country.borders = countryData.borders;
+
+                break;
+            }
+        
+        return countryTeamsListCopy;
+    }
+
     // Validate values
 
     // Validate an API key that looks like this "fffb262b-0324-499a-94a6-eebf845e6123"
@@ -141,5 +188,10 @@ export default class Network {
         const SQL = "SELECT APIKey FROM BuildTeams";
         const result = await this.networkDatabase.query(SQL); // result: [{"APIKey":"super_cool_api_key"}]
         return result.map((row: { APIKey: string }) => row.APIKey); // result: ["super_cool_api_key"]
+    }
+
+    async getCountryTeamsListFromDatabase() {
+        const SQL = "SELECT `RegionCode`, `BuildTeam`, `RegionName` FROM `BuildTeamRegions` WHERE `RegionType` = 'COUNTRY'";
+        return await this.networkDatabase.query(SQL); // result: [{"RegionCode":"ABW","BuildTeam":"m3pKPALP","RegionName":"Aruba"}]
     }
 }

@@ -441,7 +441,7 @@
         }
       }
     },
-    "/api/countries": {
+    "/api/teams/countries": {
       "get": {
         "tags": [
           "Build Teams"

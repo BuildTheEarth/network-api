@@ -3,17 +3,17 @@ import Network from "../../struct/core/network.js";
 
 export async function initRoutes(app: Router, joi: any, network: Network) {
 
-    app.get('/api/countries', async function (req, res) {
+    app.get('/api/teams/countries', async function (req, res) {
 
-        //TODO get a json of all countries from the DB
-        const countries = "placeholder";
+        // Get a json of all countries from the DB in the specified format
+        const countries = await network.getCountryTeamsList();
 
-        if(countries == null) {
+        if (countries == null) {
             res.status(400).send({ error: 'No countries found.' });
             return;
         }
-        
+
         res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify(countries))
-    })
+        res.send(JSON.stringify(countries));
+    });
 }
