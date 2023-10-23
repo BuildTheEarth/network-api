@@ -564,6 +564,124 @@
           }
         }
       },
+      "put": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Updates a Build Team Warp",
+        "description": "Updates an existing warp of a build team with new values.",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                    "ID": {
+                        "type": "string",
+                        "description": "The ID of the warp.",
+                        "required": true
+                    },
+                    "key": {
+                        "type": "string",
+                        "description": "The key of the warp.",
+                        "required": false
+                    },
+                    "countryCode": {
+                        "type": "string",
+                        "description": "Country Code that matches the countryCodeType.",
+                        "required": false,
+                        "example": "276"
+                    },
+                    "countryCodeType": {
+                        "type": "string",
+                        "description": "Country Code Type like cca2, cca3, ccn3, or cioc",
+                        "enum": ["cca2", "cca3", "ccn3", "cioc"],
+                        "required": false,
+                        "example": "ccn3"
+                    },
+                    "subRegion": {
+                        "type": "string",
+                        "description": "Name of the the subregion like state or province.",
+                        "required": false,
+                        "example": "Hesse"
+                    },
+                    "city": {
+                        "type": "string",
+                        "description": "Name of the city.",
+                        "required": false,
+                        "example": "Frankfurt am Main"
+                    },
+                    "worldName": {
+                        "type": "string",
+                        "description": "The name of the world the warp is in.",
+                        "required": false,
+                        "example": "world"
+                    },
+                    "lat": {
+                        "type": "number",
+                        "description": "The latitude of the warp.",
+                        "required": false,
+                        "example": 50.113481708923736
+                    },
+                    "lon": {
+                        "type": "number",
+                        "description": "The longitude of the warp.",
+                        "required": false,
+                        "example": 8.679198129877463
+                    },
+                    "y": {
+                        "type": "number",
+                        "description": "The y coordinate of the warp.",
+                        "required": false,
+                        "example": 32
+                    },
+                    "yaw": {
+                        "type": "number",
+                        "description": "The yaw of the warp.",
+                        "required": false,
+                        "example": 90
+                    },
+                    "pitch": {
+                        "type": "number",
+                        "description": "The pitch of the warp.",
+                        "required": false,
+                        "example": 0
+                    },
+                    "isHighlight": {
+                        "type": "boolean",
+                        "description": "Whether the warp is a highlight or not.",
+                        "required": false,
+                        "example": false
+                    }
+
+                },
+                "example": [
+                  {
+                    "ID": "cf0d3acb-e3df-4cdf-9960-d5e90aadf167",
+                    "key": "New Warp Name",
+                    "yaw": 180
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
       "delete": {
         "tags": [
           "Build Teams"

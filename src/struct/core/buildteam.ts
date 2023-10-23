@@ -170,6 +170,74 @@ export default class BuildTeam {
         return await this.createWarpInDatabase(randomId, this.buildTeamID, key, finalCountryCode, subRegion, city, worldName, lat, lon, y, yaw, pitch, isHighlight);
     }
 
+
+    /** Updates an existing warp of the build team.
+     * 
+     * @param ID The ID of the warp
+     * @param key The key of the warp
+     * @param countryCode Country Code that matches the countryCodeType
+     * @param countryCodeType Country Code Type like cca2, cca3, ccn3, or cioc
+     * @param subRegion Name of the the subregion like state or province.
+     * @param city Name of the city
+     * @param worldName The name of the world the warp is in
+     * @param lat The latitude of the warp
+     * @param lon The longitude of the warp
+     * @param y The y coordinate of the warp
+     * @param yaw The yaw of the warp
+     * @param pitch The pitch of the warp
+     * @param isHighlight Whether the warp is a highlight or not
+     * 
+     * @returns Returns true if the warp was created successfully, otherwise false.
+     **/
+    async updateWarp(ID: string, key: string, countryCode: string, countryCodeType: string, subRegion: string, city: string, worldName: string, lat: number, lon: number, y: number, yaw: number, pitch: number, isHighlight: boolean) {
+        // Validate that the build team id is loaded
+        if(this.buildTeamID == null)
+            await this.loadBuildTeamData();
+        if(this.buildTeamID == null)
+            return false;
+
+        // Check if the warp exists
+        const warps = await this.getWarps();
+        const warp = warps.find((warp: any) => warp.ID == ID);
+
+        // If the warp was not found, return an error
+        if(warp == null){
+            return false;
+        }
+
+
+        // Convert the country code to cca3 if needed
+        let finalCountryCode: string = countryCode;
+
+        if(countryCodeType == "cca2" || countryCodeType == "ccn3" || countryCodeType == "cioc"){
+            const filePath = path.join(process.cwd(), 'lib', 'countries.json');
+            const rawData = await fs.readFile(filePath, 'utf-8');
+            const countriesData = JSON.parse(rawData);
+            let found = false;
+
+            for (const countryData of countriesData) 
+                if(countryCodeType == "cca2" && countryData.cca2 == countryCode){
+                    finalCountryCode = countryData.cca3;
+                    found = true;
+                    break;
+                }else if(countryCodeType == "ccn3" && countryData.ccn3 == countryCode){
+                    finalCountryCode = countryData.cca3
+                    found = true;
+                    break;
+                }else if(countryCodeType == "cioc" && countryData.cioc == countryCode){
+                    finalCountryCode = countryData.cca3;
+                    found = true;
+                    break;
+                }
+
+            if(!found)
+                return false;
+        }
+
+        return await this.updateWarpInDatabase(ID, this.buildTeamID, key, finalCountryCode, subRegion, city, worldName, lat, lon, y, yaw, pitch, isHighlight);
+    }
+
+
     /** Deletes a warp from the build team.
      * 
      * @param key The name or ID of the warp
@@ -432,6 +500,18 @@ export default class BuildTeam {
         const SQL = "UPDATE plotsystem_plots SET city_project_id = ?, difficulty_id = ?, review_id = ?, owner_uuid = ?, member_uuids = ?, status = ?, mc_coordinates = ?, outline = ?, score = ?, last_activity = ?, pasted = ?, type = ?, version = ? WHERE id = ?";
 
         const result = await this.psDatabase.query(SQL, [city_project_id, difficulty_id, review_id, owner_uuid, member_uuids, status, mc_coordinates, outline, score, last_activity, pasted, type, version, plot_id]);
+
+        if(result.affectedRows == 1)
+            return true;
+        else 
+            return false;
+    }
+
+    // Updates an existing warp in the database
+    async updateWarpInDatabase(ID: string, buildTeamID: string, name: string, countryCode: string, subRegion: string, city: string, worldName: string, lat: number, lon: number, height: number, yaw: number, pitch: number, isHighlight: boolean) {
+        const SQL = "UPDATE BuildTeamWarps SET ID = ?, BuildTeam = ?, Name = ?, CountryCode = ?, SubRegion = ?, City = ?, WorldName = ?, Latitude = ?, Longitude = ?, Height = ?, Yaw = ?, Pitch = ?, IsHighlight = ? WHERE ID = ? AND BuildTeam = ?";
+
+        const result = await this.nwDatabase.query(SQL, [ID, buildTeamID, name, countryCode, subRegion, city, worldName, lat, lon, height, yaw, pitch, isHighlight, ID, buildTeamID]);
 
         if(result.affectedRows == 1)
             return true;

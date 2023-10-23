@@ -140,6 +140,11 @@ router.use(helmet());
   Joi,
   network
 );
+(await import("./routes/teams/PUT_Warp.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
 
 // Init DELETE Routes for the API
 (await import("./routes/teams/DELETE_Warp.js")).initRoutes(
