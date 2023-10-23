@@ -170,40 +170,21 @@ export default class BuildTeam {
         return await this.createWarpInDatabase(randomId, this.buildTeamID, key, finalCountryCode, subRegion, city, worldName, lat, lon, y, yaw, pitch, isHighlight);
     }
 
-    /** Returns a list of all warps. If no warps are found, an empty list is returned.*/
-    async getWarps(){
-        return await this.getWarpsByFilter();
-    }
 
     /** Returns a list of warps based on the build team id. If no warps are found, an empty list is returned.*/
-    async getWarpsByBuildTeamID(buildTeamID: string){
-        return await this.getWarpsByFilter("BuildTeam = '" + buildTeamID + "'");
-    }
+    async getWarps(){
+        if(this.buildTeamID == null)
+            await this.loadBuildTeamData();
 
-    /** Returns a list of warps based on the country code. If no warps are found, an empty list is returned.*/
-    async getWarpsByCountry(countryCode: string){
-        return await this.getWarpsByFilter("CountryCode = '" + countryCode + "'");
-    }
+        if(this.buildTeamID == null)
+            return [];
+    
+        const result = await this.network.getWarps();
 
-    /** Returns a list of warps based on the sub region. If no warps are found, an empty list is returned.*/
-    async getWarpsBySubRegion(subRegion: string){
-        return await this.getWarpsByFilter("SubRegion = '" + subRegion + "'");
-    }
+        if(result == null)
+            return [];
 
-    /** Returns a list of warps based on the city. If no warps are found, an empty list is returned.*/
-    async getWarpsByCity(city: string){
-        return await this.getWarpsByFilter("City = '" + city + "'");
-    }
-
-    /** Returns a list of warps. If no warps are found, an empty list is returned.
-     * 
-     * @param filter The filter for the warps. Example: "BuildTeam = 'XYZ'" or "BuildTeam = 'XYZ' AND IsHighlight = 1"
-     */
-    private async getWarpsByFilter(filter?: string){
-        if(filter == null || filter == "")
-            filter = "1=1";
-
-        return await this.getWarpsFromDatabase(filter);
+        return result.filter((warp: any) => warp.BuildTeam == this.buildTeamID);
     }
 
 
@@ -352,7 +333,7 @@ export default class BuildTeam {
     
 
     /* =================================================== */
-    /*         PLOT SYSTEM DATABASE GET REQUESTS           */
+    /*              DATABASE GET REQUESTS                  */
     /* =================================================== */
 
     async getBuildTeamIDFromDatabase(){
@@ -363,11 +344,6 @@ export default class BuildTeam {
             return null;
 
         return result[0].btid;
-    }
-
-    async getWarpsFromDatabase(filter: string){
-        const SQL = "SELECT * FROM BuildTeamWarps WHERE " + filter;
-        return await this.nwDatabase.query(SQL);
     }
     
     async getPSCountriesFromDatabase(){

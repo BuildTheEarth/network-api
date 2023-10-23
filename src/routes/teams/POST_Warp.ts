@@ -44,20 +44,20 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
 
 
         // Get the parameters from the request
-        const key = req.body.key;                           // The key of the warp
-        const countryCode = req.body.countryCode;           // Country Code that matches the countryCodeType
-        const countryCodeType = req.body.countryCodeType;   // Country Code Type like cca2, cca3, ccn3, or cioc
+        const key = req.body.key;                           // The key of the warp.
+        const countryCode = req.body.countryCode;           // Country Code that matches the countryCodeType.
+        const countryCodeType = req.body.countryCodeType;   // Country Code Type like cca2, cca3, ccn3, or cioc.
         const subRegion = req.body.subRegion;               // Name of the the subregion like state or province.
-        const city = req.body.city;                         // Name of the city
+        const city = req.body.city;                         // Name of the city.
 
-        const worldName = req.body.worldName;               // The name of the world the warp is in
-        const lat = req.body.lat;                           // The latitude of the warp
-        const lon = req.body.lon;                           // The longitude of the warp
-        const y = req.body.y;                               // The y coordinate of the warp
-        const yaw = req.body.yaw;                           // The yaw of the warp
-        const pitch = req.body.pitch;                       // The pitch of the warp
+        const worldName = req.body.worldName;               // The name of the world the warp is in.
+        const lat = req.body.lat;                           // The latitude of the warp.
+        const lon = req.body.lon;                           // The longitude of the warp.
+        const y = req.body.y;                               // The y coordinate of the warp.
+        const yaw = req.body.yaw;                           // The yaw of the warp.
+        const pitch = req.body.pitch;                       // The pitch of the warp.
 
-        const isHighlight = req.body.isHighlight;           // Whether the warp is a highlight or not
+        const isHighlight = req.body.isHighlight;           // Whether the warp is a highlight or not.
 
 
         // Create a new warp

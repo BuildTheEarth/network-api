@@ -156,6 +156,13 @@ export default class Network {
         return countryTeamsListCopy;
     }
 
+    /** Returns a list of all warps. If no warps are found, an empty list is returned.*/
+    async getWarps(){
+        return await this.getWarpsFromDatabase();
+    }
+
+
+
     // Validate values
 
     // Validate an API key that looks like this "fffb262b-0324-499a-94a6-eebf845e6123"
@@ -182,7 +189,11 @@ export default class Network {
         return true;
     }
 
-    // Get values from database
+
+
+    /* =================================================== */
+    /*              DATABASE GET REQUESTS                  */
+    /* =================================================== */
 
     async getAPIKeysFromDatabase() {
         const SQL = "SELECT APIKey FROM BuildTeams";
@@ -193,5 +204,10 @@ export default class Network {
     async getCountryTeamsListFromDatabase() {
         const SQL = "SELECT `RegionCode`, `BuildTeam`, `RegionName` FROM `BuildTeamRegions` WHERE `RegionType` = 'COUNTRY'";
         return await this.networkDatabase.query(SQL); // result: [{"RegionCode":"ABW","BuildTeam":"m3pKPALP","RegionName":"Aruba"}]
+    }
+
+    async getWarpsFromDatabase(){
+        const SQL = "SELECT * FROM BuildTeamWarps";
+        return await this.networkDatabase.query(SQL);
     }
 }

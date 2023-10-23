@@ -423,7 +423,7 @@
           "Build Teams"
         ],
         "summary": "Get Build Team Tag",
-        "description": "Returns the tag a build team of BuildTheEarth.",
+        "description": "Returns the Tag of a Build Team in BuildTheEarth.",
         "parameters": [
           {
             "name": "api_key",
@@ -441,6 +441,130 @@
         }
       }
     },
+    "/api/teams/%API_KEY%/warps": {
+      "get": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Get Build Team Warps",
+        "description": "Returns the warps of a build team of BuildTheEarth.",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+
+      "post": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Create Build Team Warp",
+        "description": "Creates a new warp for a build team of BuildTheEarth.",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key of the warp."
+                    },
+                    "countryCode": {
+                        "type": "string",
+                        "description": "Country Code that matches the countryCodeType."
+                    },
+                    "countryCodeType": {
+                        "type": "string",
+                        "description": "Country Code Type like cca2, cca3, ccn3, or cioc",
+                        "enum": ["cca2", "cca3", "ccn3", "cioc"]
+                    },
+                    "subRegion": {
+                        "type": "string",
+                        "description": "Name of the the subregion like state or province."
+                    },
+                    "city": {
+                        "type": "string",
+                        "description": "Name of the city."
+                    },
+                    "worldName": {
+                        "type": "string",
+                        "description": "The name of the world the warp is in."
+                    },
+                    "lat": {
+                        "type": "number",
+                        "description": "The latitude of the warp."
+                    },
+                    "lon": {
+                        "type": "number",
+                        "description": "The longitude of the warp."
+                    },
+                    "y": {
+                        "type": "number",
+                        "description": "The y coordinate of the warp."
+                    },
+                    "yaw": {
+                        "type": "number",
+                        "description": "The yaw of the warp."
+                    },
+                    "pitch": {
+                        "type": "number",
+                        "description": "The pitch of the warp."
+                    },
+                    "isHighlight": {
+                        "type": "boolean",
+                        "description": "Whether the warp is a highlight or not."
+                    }
+
+                },
+                "example": [
+                  {
+                    "key": "My Test Warp",
+                    "countryCode": "276",
+                    "countryCodeType": "ccn3",
+                    "subRegion": "Hesse",
+                    "city": "Frankfurt am Main",
+                    "worldName": "world",
+                    "lat": 50.113481708923736,
+                    "lon": 8.679198129877463,
+                    "y": 32,
+                    "yaw": 90,
+                    "pitch": 0,
+                    "isHighlight": false
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/teams/countries": {
       "get": {
         "tags": [
@@ -451,6 +575,49 @@
         "responses": {
           "400": {
             "description": "No countries found."
+          }
+        }
+      }
+    },
+    "/api/teams/warps": {
+      "get": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Get Warps",
+        "description": "Get a list of all warps in BuildTheEarth.",
+        "parameters": [
+          {
+            "name": "country",
+            "description": "Filter the warps by country code.",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "subRegion",
+            "description": "Filter the warps by subregion.",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "city",
+            "description": "Filter the warps by city.",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "No warps found."
           }
         }
       }

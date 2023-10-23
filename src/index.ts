@@ -25,6 +25,9 @@ const network = new Network(plotsystemDatabase, networkDatabase);
   Joi,
   network.getPlotSystem()
 );
+
+// PlotSystem Imports
+
 (await import("./routes/plotsystem/teams/GET_Cities.js")).initRoutes(
   router,
   Joi,
@@ -50,7 +53,15 @@ const network = new Network(plotsystemDatabase, networkDatabase);
   Joi,
   network
 );
+
+// Teams Imports
+
 (await import("./routes/teams/GET_Countries.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
+(await import("./routes/teams/GET_Warps.js")).initRoutes(
   router,
   Joi,
   network
@@ -91,6 +102,11 @@ const network = new Network(plotsystemDatabase, networkDatabase);
   network
 );
 (await import("./routes/teams/GET_TeamTag.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
+(await import("./routes/teams/GET_TeamWarps.js")).initRoutes(
   router,
   Joi,
   network
