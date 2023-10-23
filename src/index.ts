@@ -97,9 +97,22 @@ const network = new Network(plotsystemDatabase, networkDatabase);
 );
 
 
+// Use the body-parser middleware
+//@ts-ignore
+router.use(express.json());
+// Use CORS & Helmet
+router.use(cors());
+router.use(helmet());
+
+
 // Init POST Routes for the API
 
 (await import("./routes/plotsystem/teams/POST_Plots.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
+(await import("./routes/teams/POST_Warp.js")).initRoutes(
   router,
   Joi,
   network
@@ -112,12 +125,7 @@ const network = new Network(plotsystemDatabase, networkDatabase);
   network
 );
 
-// Use the body-parser middleware
-//@ts-ignore
-router.use(express.json());
-// Use CORS & Helmet
-router.use(cors());
-router.use(helmet());
+
 
 // A timer that runs every 1 minute
 setInterval(() => {
