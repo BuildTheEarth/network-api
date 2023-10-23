@@ -218,7 +218,7 @@ export default class BuildTeam {
         if(this.psCities == null || this.psCities.size == 0)
             await this.loadBuildTeamData();
 
-        const cities = [];
+        const cities: any[] = [];
         for(const city of this.psCities.values())
             cities.push(...city);
 
@@ -266,7 +266,7 @@ export default class BuildTeam {
         if(this.psCities == null || this.psCities.size == 0)
             await this.loadBuildTeamData();
 
-        const plots = [];
+        const plots: any[] = [];
         for(const city of await this.getPSCities()){
             const cityPlots = await this.getPSPlotsByCity(city.id);
             plots.push(...cityPlots);
@@ -332,7 +332,7 @@ export default class BuildTeam {
         if(this.psCities == null || this.psCities.size == 0)
             await this.loadBuildTeamData();
 
-        const reviews = [];
+        const reviews: any[] = [];
         for(const city of await this.getPSCities()){
             const cityReviews = await this.getPSReviewsByCity(city.id);
             reviews.push(...cityReviews);

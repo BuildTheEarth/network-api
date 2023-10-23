@@ -36,7 +36,7 @@ export default class Network {
         if(this.apiKeys == null || this.updateCacheTicks % Network.API_KEY_UPDATE_INTERVAL == 0)
             this.apiKeys = await this.getAPIKeysFromDatabase();
 
-        let bar = null;
+        let bar:ProgressBar|null = null;
         if (isStarting == true) {
             // Get how many API keys there are as an integer
             var len = (this?.apiKeys?.length ?? 0) + 1;
