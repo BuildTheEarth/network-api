@@ -1,9 +1,11 @@
 import DatabaseHandler from "../database.js";
 import Network from "./network.js";
+import { v4 as uuidv4 } from 'uuid';
+import fs from 'fs/promises';
+import path from 'path';
 
 
 export default class BuildTeam {
-
     private static readonly CITY_UPDATE_INTERVAL: number = 60 * 24; // 24 hours
     private static readonly COUNTRY_UPDATE_INTERVAL: number = 60 * 24; // 24 hours
     private static readonly SERVER_UPDATE_INTERVAL: number = 60 * 24; // 24 hours
@@ -12,11 +14,11 @@ export default class BuildTeam {
 
 
     private apiKey: string;
+    private buildTeamID: string | null = null;
     private network: Network;
     private psDatabase: DatabaseHandler
     private nwDatabase: DatabaseHandler
 
-    private psBuildTeamID: string | null = null;
     private psCities: Map<number, any[]> = new Map() // Map<country_id, city>
     private psCountries: Map<number, any[]> = new Map() // Map<country_id, country>
     private psServers: Map<number, any[]> = new Map() // Map<server_id, server>
@@ -62,11 +64,11 @@ export default class BuildTeam {
         // Get the build team information
         this.buildTeamInfo = await this.getBuildTeamInfoFromDatabase();
 
+        this.buildTeamID = await this.getBuildTeamIDFromDatabase();
 
-        this.psBuildTeamID = await this.getPSBuildTeamIDFromDatabase();
-
-        if(this.psBuildTeamID == undefined || this.psBuildTeamID == null)
+        if(this.buildTeamID == undefined || this.buildTeamID == null)
             return;
+
 
         // Update all countries, cities, servers and ftp configurations
         const countries = await this.getPSCountriesFromDatabase();
@@ -110,6 +112,100 @@ export default class BuildTeam {
 
         return this.buildTeamInfo[0][key];
     }
+
+    /** Creates a new warp for the build team.
+     * 
+     * @param key The key of the warp
+     * @param countryCode Country Code that matches the countryCodeType
+     * @param countryCodeType Country Code Type like cca2, cca3, ccn3, or cioc
+     * @param subRegion Name of the the subregion like state or province.
+     * @param city Name of the city
+     * @param worldName The name of the world the warp is in
+     * @param lat The latitude of the warp
+     * @param lon The longitude of the warp
+     * @param y The y coordinate of the warp
+     * @param yaw The yaw of the warp
+     * @param pitch The pitch of the warp
+     * @param isHighlight Whether the warp is a highlight or not
+     * 
+     * @returns Returns true if the warp was created successfully, otherwise false.
+     **/
+    async createWarp(key: string, countryCode: string, countryCodeType: string, subRegion: string, city: string, worldName: string, lat: number, lon: number, y: number, yaw: number, pitch: number, isHighlight: boolean) {
+        const randomId: string = uuidv4();
+
+        // Validate that the build team id is loaded
+        if(this.buildTeamID == null)
+            await this.loadBuildTeamData();
+        if(this.buildTeamID == null)
+            return false;
+
+        // Convert the country code to cca3 if needed
+        let finalCountryCode: string = countryCode;
+
+        if(countryCodeType == "cca2" || countryCodeType == "ccn3" || countryCodeType == "cioc"){
+            const filePath = path.join(process.cwd(), 'lib', 'countries.json');
+            const rawData = await fs.readFile(filePath, 'utf-8');
+            const countriesData = JSON.parse(rawData);
+            let found = false;
+
+            for (const countryData of countriesData) 
+                if(countryCodeType == "cca2" && countryData.cca2 == countryCode){
+                    finalCountryCode = countryData.cca3;
+                    found = true;
+                    break;
+                }else if(countryCodeType == "ccn3" && countryData.ccn3 == countryCode){
+                    finalCountryCode = countryData.cca3
+                    found = true;
+                    break;
+                }else if(countryCodeType == "cioc" && countryData.cioc == countryCode){
+                    finalCountryCode = countryData.cca3;
+                    found = true;
+                    break;
+                }
+
+            if(!found)
+                return false;
+        }
+        
+        return await this.createWarpInDatabase(randomId, this.buildTeamID, key, finalCountryCode, subRegion, city, worldName, lat, lon, y, yaw, pitch, isHighlight);
+    }
+
+    /** Returns a list of all warps. If no warps are found, an empty list is returned.*/
+    async getWarps(){
+        return await this.getWarpsByFilter();
+    }
+
+    /** Returns a list of warps based on the build team id. If no warps are found, an empty list is returned.*/
+    async getWarpsByBuildTeamID(buildTeamID: string){
+        return await this.getWarpsByFilter("BuildTeam = '" + buildTeamID + "'");
+    }
+
+    /** Returns a list of warps based on the country code. If no warps are found, an empty list is returned.*/
+    async getWarpsByCountry(countryCode: string){
+        return await this.getWarpsByFilter("CountryCode = '" + countryCode + "'");
+    }
+
+    /** Returns a list of warps based on the sub region. If no warps are found, an empty list is returned.*/
+    async getWarpsBySubRegion(subRegion: string){
+        return await this.getWarpsByFilter("SubRegion = '" + subRegion + "'");
+    }
+
+    /** Returns a list of warps based on the city. If no warps are found, an empty list is returned.*/
+    async getWarpsByCity(city: string){
+        return await this.getWarpsByFilter("City = '" + city + "'");
+    }
+
+    /** Returns a list of warps. If no warps are found, an empty list is returned.
+     * 
+     * @param filter The filter for the warps. Example: "BuildTeam = 'XYZ'" or "BuildTeam = 'XYZ' AND IsHighlight = 1"
+     */
+    private async getWarpsByFilter(filter?: string){
+        if(filter == null || filter == "")
+            filter = "1=1";
+
+        return await this.getWarpsFromDatabase(filter);
+    }
+
 
 
     /* ======================================= */
@@ -259,19 +355,24 @@ export default class BuildTeam {
     /*         PLOT SYSTEM DATABASE GET REQUESTS           */
     /* =================================================== */
 
-    async getPSBuildTeamIDFromDatabase(){
-        const SQL = "SELECT a.id as btid FROM plotsystem_buildteams as a WHERE api_key_id = (SELECT b.id FROM plotsystem_api_keys as b WHERE api_key = ?)";
-        const result = await this.psDatabase.query(SQL, [this.apiKey]);
+    async getBuildTeamIDFromDatabase(){
+        const SQL = "SELECT ID as btid FROM BuildTeams WHERE APIKey = ?";
+        const result = await this.nwDatabase.query(SQL, [this.apiKey]);
 
         if(result.length == 0)
             return null;
 
         return result[0].btid;
     }
+
+    async getWarpsFromDatabase(filter: string){
+        const SQL = "SELECT * FROM BuildTeamWarps WHERE " + filter;
+        return await this.nwDatabase.query(SQL);
+    }
     
     async getPSCountriesFromDatabase(){
         const SQL = "SELECT a.* FROM plotsystem_countries as a, plotsystem_buildteam_has_countries as b WHERE buildteam_id = ? AND a.id = b.country_id";
-        return await this.psDatabase.query(SQL, [this.psBuildTeamID]);
+        return await this.psDatabase.query(SQL, [this.buildTeamID]);
     }
 
     async getPSCitiesFromDatabase(country_id: number){
@@ -307,7 +408,7 @@ export default class BuildTeam {
 
 
     /* =================================================== */
-    /*         PLOTSYSTEM DATABASE POST REQUEST            */
+    /*                DATABASE POST REQUEST                */
     /* =================================================== */
 
     async createPSPlotInDatabase(city_project_id: number, difficulty_id: number, mc_coordinates: [number, number, number], outline: any, create_player: string, version: string){
@@ -321,9 +422,19 @@ export default class BuildTeam {
             return false;
     }   
 
+    async createWarpInDatabase(ID: string, buildTeamID: string, name: string, countryCode: string, subRegion: string, city: string, worldName: string, lat: number, lon: number, height: number, yaw: number, pitch: number, isHighlight: boolean) {
+        const SQL = "INSERT INTO BuildTeamWarps (ID, BuildTeam, Name, CountryCode, SubRegion, City, WorldName, Latitude, Longitude, Height, Yaw, Pitch, IsHighlight) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        const result = await this.nwDatabase.query(SQL, [ID, buildTeamID, name, countryCode, subRegion, city, worldName, lat, lon, height, yaw, pitch, isHighlight]);
+
+        if(result.affectedRows == 1)
+            return true;
+        else 
+            return false;
+    }
 
     /* =================================================== */
-    /*         PLOTSYSTEM DATABASE PUT REQUEST             */
+    /*                DATABASE PUT REQUEST                 */
     /* =================================================== */
 
     // Updates the plot with the given plot id. If one of the parameters is null, the value in the database is not updated.
@@ -337,4 +448,6 @@ export default class BuildTeam {
         else 
             return false;
     }
+
+
 }
