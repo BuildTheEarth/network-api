@@ -170,6 +170,20 @@ export default class BuildTeam {
         return await this.createWarpInDatabase(randomId, this.buildTeamID, key, finalCountryCode, subRegion, city, worldName, lat, lon, y, yaw, pitch, isHighlight);
     }
 
+    /** Deletes a warp from the build team.
+     * 
+     * @param key The name or ID of the warp
+     */
+    async deleteWarp(key: string) {
+        // Validate that the build team id is loaded
+        if(this.buildTeamID == null)
+            await this.loadBuildTeamData();
+
+        if(this.buildTeamID == null)
+            return false;
+
+        return await this.deleteWarpInDatabase(key);
+    }
 
     /** Returns a list of warps based on the build team id. If no warps are found, an empty list is returned.*/
     async getWarps(){
@@ -426,4 +440,19 @@ export default class BuildTeam {
     }
 
 
+    /* =================================================== */
+    /*                DATABASE DELETE REQUEST              */
+    /* =================================================== */
+
+    // Deletes a warp from the database
+    async deleteWarpInDatabase(key: string) {
+        const SQL = "DELETE FROM BuildTeamWarps WHERE (Name = ? OR ID = ?) AND BuildTeam = ?";
+
+        const result = await this.nwDatabase.query(SQL, [key, key, this.buildTeamID]);
+
+        if(result.affectedRows == 1)
+            return true;
+        else 
+            return false;
+    }
 }

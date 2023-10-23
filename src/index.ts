@@ -141,6 +141,12 @@ router.use(helmet());
   network
 );
 
+// Init DELETE Routes for the API
+(await import("./routes/teams/DELETE_Warp.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
 
 
 // A timer that runs every 1 minute

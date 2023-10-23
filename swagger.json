@@ -469,7 +469,7 @@
         "tags": [
           "Build Teams"
         ],
-        "summary": "Create Build Team Warp",
+        "summary": "Create a Build Team Warp",
         "description": "Creates a new warp for a build team of BuildTheEarth.",
         "parameters": [
           {
@@ -554,6 +554,44 @@
                     "isHighlight": false
                   }
                 ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Delete a Build Team Warp",
+        "description": "Deletes an existing warp from a build team of BuildTheEarth.",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The ID or Name of the warp.",
+                        "example": "My Test Warp"
+                    }
+                }
               }
             }
           }
