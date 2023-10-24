@@ -472,6 +472,32 @@
             "description": "Success"
           }
         }
+      }
+    },
+      
+    "/api/teams/%API_KEY%/warps": {
+      "get": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Get Build Team Warps",
+        "description": "Returns the warps of a build team of BuildTheEarth.",
+        "parameters": [
+          {
+            "name": "API_KEY",
+            "description": "The API Key of the Build Team.",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
       },
 
       "post": {
