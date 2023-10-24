@@ -249,7 +249,7 @@
         }
       }
     },
-    "/api/teams/%API_KEY%": {
+    "/api/teams/%KEY%": {
       "get": {
         "tags": [
           "Build Teams"
@@ -258,7 +258,8 @@
         "description": "Returns all general information about a Build Team of BuildTheEarth.",
         "parameters": [
           {
-            "name": "api_key",
+            "name": "KEY",
+            "description": "The API Key, Build Team ID or Build Team Tag of the Build Team.",
             "in": "path",
             "schema": {
               "type": "string"
@@ -273,7 +274,7 @@
         }
       }
     },
-    "/api/teams/%API_KEY%/blank_name": {
+    "/api/teams/%KEY%/blank_name": {
       "get": {
         "tags": [
           "Build Teams"
@@ -282,7 +283,8 @@
         "description": "Returns the blank name of a Build Team of BuildTheEarth without any color codes.",
         "parameters": [
           {
-            "name": "api_key",
+            "name": "KEY",
+            "description": "The API Key, Build Team ID or Build Team Tag of the Build Team.",
             "in": "path",
             "schema": {
               "type": "string"
@@ -297,7 +299,7 @@
         }
       }
     },
-    "/api/teams/%API_KEY%/continent": {
+    "/api/teams/%KEY%/continent": {
       "get": {
         "tags": [
           "Build Teams"
@@ -306,7 +308,8 @@
         "description": "Returns the continent of a Build Team of BuildTheEarth.",
         "parameters": [
           {
-            "name": "api_key",
+            "name": "KEY",
+            "description": "The API Key, Build Team ID or Build Team Tag of the Build Team.",
             "in": "path",
             "schema": {
               "type": "string"
@@ -321,7 +324,7 @@
         }
       }
     },
-    "/api/teams/%API_KEY%/description": {
+    "/api/teams/%KEY%/description": {
       "get": {
         "tags": [
           "Build Teams"
@@ -330,7 +333,8 @@
         "description": "Returns the description of a Build Team of BuildTheEarth.",
         "parameters": [
           {
-            "name": "api_key",
+            "name": "KEY",
+            "description": "The API Key, Build Team ID or Build Team Tag of the Build Team.",
             "in": "path",
             "schema": {
               "type": "string"
@@ -345,7 +349,7 @@
         }
       }
     },
-    "/api/teams/%API_KEY%/headid": {
+    "/api/teams/%KEY%/headid": {
       "get": {
         "tags": [
           "Build Teams"
@@ -354,7 +358,8 @@
         "description": "Returns the Custom Minecraft Head ID of a Build Team of BuildTheEarth used by https://minecraft-heads.com/custom-heads.",
         "parameters": [
           {
-            "name": "api_key",
+            "name": "KEY",
+            "description": "The API Key, Build Team ID or Build Team Tag of the Build Team.",
             "in": "path",
             "schema": {
               "type": "string"
@@ -369,7 +374,7 @@
         }
       }
     },
-    "/api/teams/%API_KEY%/name": {
+    "/api/teams/%KEY%/name": {
       "get": {
         "tags": [
           "Build Teams"
@@ -378,7 +383,8 @@
         "description": "Returns the display name of a Build Team of BuildTheEarth.",
         "parameters": [
           {
-            "name": "api_key",
+            "name": "KEY",
+            "description": "The API Key, Build Team ID or Build Team Tag of the Build Team.",
             "in": "path",
             "schema": {
               "type": "string"
@@ -393,7 +399,7 @@
         }
       }
     },
-    "/api/teams/%API_KEY%/owners": {
+    "/api/teams/%KEY%/owners": {
       "get": {
         "tags": [
           "Build Teams"
@@ -402,7 +408,8 @@
         "description": "Returns the Minecraft UUIDs of a Build Team Owners of BuildTheEarth.",
         "parameters": [
           {
-            "name": "api_key",
+            "name": "KEY",
+            "description": "The API Key, Build Team ID or Build Team Tag of the Build Team.",
             "in": "path",
             "schema": {
               "type": "string"
@@ -417,7 +424,7 @@
         }
       }
     },
-    "/api/teams/%API_KEY%/tag": {
+    "/api/teams/%KEY%/tag": {
       "get": {
         "tags": [
           "Build Teams"
@@ -426,7 +433,8 @@
         "description": "Returns the Tag of a Build Team in BuildTheEarth.",
         "parameters": [
           {
-            "name": "api_key",
+            "name": "KEY",
+            "description": "The API Key or Build Team ID of the Build Team.",
             "in": "path",
             "schema": {
               "type": "string"
@@ -441,7 +449,7 @@
         }
       }
     },
-    "/api/teams/%API_KEY%/warps": {
+    "/api/teams/%KEY%/warps": {
       "get": {
         "tags": [
           "Build Teams"
@@ -450,7 +458,8 @@
         "description": "Returns the warps of a build team of BuildTheEarth.",
         "parameters": [
           {
-            "name": "api_key",
+            "name": "KEY",
+            "description": "The API Key, Build Team ID or Build Team Tag of the Build Team.",
             "in": "path",
             "schema": {
               "type": "string"
