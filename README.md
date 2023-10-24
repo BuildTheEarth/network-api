@@ -17,7 +17,7 @@ _A REST-API to interface with data from the BuildTheEarth.net Minecraft Network.
 
 ## Routes
 
-Plot System API Documentation: 
+Network API Documentation: 
 https://buildtheearth.github.io/network-api/
 
 
