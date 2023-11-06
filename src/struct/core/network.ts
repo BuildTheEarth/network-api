@@ -7,6 +7,13 @@ import joi from "joi";
 import fs from 'fs/promises';
 import path from 'path';
 
+export enum BuildTeamIdentifier {
+    APIKey = "APIKey",
+    ID = "ID",
+    Tag = "Tag",
+    Server = "Server"
+}
+
 export default class Network {
     private static readonly API_KEY_UPDATE_INTERVAL: number = 10; // 10 minutes
 
@@ -18,6 +25,10 @@ export default class Network {
     private apiKeys: any[] | null = null;
     private buildTeams = new Map();
     private plotSystem: PlotSystem;
+
+    private apiKeyBuildTeamIDMap = new Map();
+    private apiKeyBuildTeamTagMap = new Map();
+    private apiKeyBuildTeamServerMap = new Map();
 
     private countryTeamsList: any | null = null;
 
@@ -33,8 +44,12 @@ export default class Network {
     async updateCache(isStarting: boolean = false) {
         this.updateCacheTicks++;
 
-        if(this.apiKeys == null || this.updateCacheTicks % Network.API_KEY_UPDATE_INTERVAL == 0)
+        if(this.apiKeys == null || this.updateCacheTicks % Network.API_KEY_UPDATE_INTERVAL == 0){
             this.apiKeys = await this.getAPIKeysFromDatabase();
+            this.apiKeyBuildTeamIDMap.clear();
+            this.apiKeyBuildTeamTagMap.clear();
+            this.apiKeyBuildTeamServerMap.clear();
+        }
 
         let bar:ProgressBar|null = null;
         if (isStarting == true) {
@@ -62,7 +77,7 @@ export default class Network {
         this.plotSystem.updateCache();
 
         for (const apiKey of this?.apiKeys?.values() ?? []) {
-            const buildTeam = await this.getBuildTeam(apiKey);
+            const buildTeam = await this.getBuildTeam(apiKey, BuildTeamIdentifier.APIKey);
 
             if (buildTeam == null) continue;
 
@@ -80,6 +95,52 @@ export default class Network {
     getUpdateCacheTicks(): number {
         return this.updateCacheTicks;
     }
+
+    async getAPIKeyByBuildTeamID(buildTeamID: string): Promise<string|null> {
+        if(this.apiKeyBuildTeamIDMap.has(buildTeamID))
+            return this.apiKeyBuildTeamIDMap.get(buildTeamID);
+
+        const result = await this.getAPIKeyByBuildTeamIDFromDatabase(buildTeamID);
+
+        if(result == null || result.length == 0)
+            return null;
+
+        const apiKey = result[0];
+
+        this.apiKeyBuildTeamIDMap.set(buildTeamID, apiKey);
+        return apiKey;
+    }
+
+    async getAPIKeyByBuildTeamTag(buildTeamTag: string): Promise<string|null> {
+        if(this.apiKeyBuildTeamTagMap.has(buildTeamTag))
+            return this.apiKeyBuildTeamTagMap.get(buildTeamTag);
+        
+        const result = await this.getAPIKeyByBuildTeamTagFromDatabase(buildTeamTag);
+
+        if(result == null || result.length == 0)
+            return null;
+    
+        const apiKey = result[0];
+
+        this.apiKeyBuildTeamTagMap.set(buildTeamTag, apiKey);
+        return apiKey;
+    }
+
+    async getAPIKeyByBuildTeamServer(buildTeamServer: string): Promise<string|null> {
+        if(this.apiKeyBuildTeamServerMap.has(buildTeamServer))
+            return this.apiKeyBuildTeamServerMap.get(buildTeamServer);
+
+            const result = await this.getAPIKeyByBuildTeamServerFromDatabase(buildTeamServer);
+
+            if(result == null || result.length == 0)
+                return null;
+        
+            const apiKey = result[0];
+
+        this.apiKeyBuildTeamServerMap.set(buildTeamServer, apiKey);
+        return apiKey;
+    }
+
 
     getAPIKeys(): string[] {
         if (this.apiKeys == null) {
@@ -102,10 +163,24 @@ export default class Network {
         return this.plotsystemDatabase;
     }
 
-    async getBuildTeam(apiKey: string): Promise<BuildTeam|null> {
+    async getBuildTeam(key: string, identifier: BuildTeamIdentifier): Promise<BuildTeam|null> {
         const api_keys = this.getAPIKeys();
 
-        // Validate that the API key exists in the plot system database
+        let apiKey = null;
+
+        if(identifier == BuildTeamIdentifier.APIKey)
+            apiKey = key;
+        else if(identifier == BuildTeamIdentifier.ID)
+            apiKey = await this.getAPIKeyByBuildTeamID(key);
+        else if(identifier == BuildTeamIdentifier.Tag)
+            apiKey = await this.getAPIKeyByBuildTeamTag(key);
+        else if(identifier == BuildTeamIdentifier.Server)
+            apiKey = await this.getAPIKeyByBuildTeamServer(key);
+
+        if(apiKey == null)
+            return null;
+
+        // Validate that the API key exists in the network database
         if (!api_keys.includes(apiKey)) return null;
 
         // Check if the build team is already in the cache
@@ -189,24 +264,72 @@ export default class Network {
         return true;
     }
 
+    // Validate a key that is either an API Key or a Build Team ID or a Build Team Tag or a BuildTeam Server ID
+    async validateKey(req: express.Request, res: express.Response): Promise<BuildTeamIdentifier|null> {
+        const apiKeys = this.getAPIKeys();
+
+        // Check if key is an API Key
+        if(apiKeys.includes(req.params.key))
+            return BuildTeamIdentifier.APIKey;
+
+        // Check if key is a Build Team ID
+        const APIKeyByBuildTeamID = await this.getAPIKeyByBuildTeamID(req.params.key);
+        if(APIKeyByBuildTeamID != null && apiKeys.includes(APIKeyByBuildTeamID))
+            return BuildTeamIdentifier.ID;
+
+        // Check if key is a Build Team Tag
+        const APIKeyByBuildTeamTag = await this.getAPIKeyByBuildTeamTag(req.params.key);
+        if(APIKeyByBuildTeamTag != null && apiKeys.includes(APIKeyByBuildTeamTag))
+            return BuildTeamIdentifier.Tag;
+
+        // Check if key is a BungeeCord Server ID
+        const APIKeyByBuildTeamServer = await this.getAPIKeyByBuildTeamServer(req.params.key);
+        if(APIKeyByBuildTeamServer != null && apiKeys.includes(APIKeyByBuildTeamServer))
+            return BuildTeamIdentifier.Server;
+
+
+        res.status(401).send({ success: false, error: "Invalid API Key, Build Team ID, Build Team Tag or Build Team Server ID" });
+        return null;   
+    }
+
+
+
 
 
     /* =================================================== */
     /*              DATABASE GET REQUESTS                  */
     /* =================================================== */
 
-    async getAPIKeysFromDatabase() {
+    private async getAPIKeysFromDatabase() : Promise<string[]> {
         const SQL = "SELECT APIKey FROM BuildTeams";
         const result = await this.networkDatabase.query(SQL); // result: [{"APIKey":"super_cool_api_key"}]
         return result.map((row: { APIKey: string }) => row.APIKey); // result: ["super_cool_api_key"]
     }
 
-    async getCountryTeamsListFromDatabase() {
+    private async getAPIKeyByBuildTeamIDFromDatabase(buildTeamID: string) : Promise<string[]> {
+        const SQL = "SELECT APIKey FROM BuildTeams WHERE ID = ?";
+        const result = await this.networkDatabase.query(SQL, [buildTeamID]); // result: [{"APIKey":"super_cool_api_key"}]
+        return result.map((row: { APIKey: string }) => row.APIKey); // result: ["super_cool_api_key"]
+    }
+
+    private async getAPIKeyByBuildTeamTagFromDatabase(buildTeamTag: string) : Promise<string[]> {
+        const SQL = "SELECT APIKey FROM BuildTeams WHERE Tag = ?";
+        const result = await this.networkDatabase.query(SQL, [buildTeamTag]); // result: [{"APIKey":"super_cool_api_key"}]
+        return result.map((row: { APIKey: string }) => row.APIKey); // result: ["super_cool_api_key"]
+    }
+
+    private async getAPIKeyByBuildTeamServerFromDatabase(buildTeamTag: string) : Promise<string[]> {
+        const SQL = "SELECT APIKey FROM BuildTeams, BuildTeamServers WHERE BuildTeams.ID = BuildTeamServers.BuildTeam AND BuildTeamServers.ShortName = ?";
+        const result = await this.networkDatabase.query(SQL, [buildTeamTag]); // result: [{"APIKey":"super_cool_api_key"}]
+        return result.map((row: { APIKey: string }) => row.APIKey); // result: ["super_cool_api_key"]
+    }
+
+    private async getCountryTeamsListFromDatabase() {
         const SQL = "SELECT `RegionCode`, `BuildTeam`, `RegionName` FROM `BuildTeamRegions` WHERE `RegionType` = 'COUNTRY'";
         return await this.networkDatabase.query(SQL); // result: [{"RegionCode":"ABW","BuildTeam":"m3pKPALP","RegionName":"Aruba"}]
     }
 
-    async getWarpsFromDatabase(){
+    private async getWarpsFromDatabase(){
         const SQL = "SELECT * FROM BuildTeamWarps";
         return await this.networkDatabase.query(SQL);
     }

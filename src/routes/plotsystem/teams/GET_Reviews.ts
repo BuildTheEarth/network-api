@@ -1,5 +1,5 @@
 import { Router } from "express";
-import Network from "../../../struct/core/network.js";
+import Network, { BuildTeamIdentifier } from "../../../struct/core/network.js";
 
 export async function initRoutes(app: Router, joi: any, network: Network) {
 
@@ -10,7 +10,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
             return;
         
         
-        const buildTeam = await network.getBuildTeam(req.params.apikey);
+            const buildTeam = await network.getBuildTeam(req.params.apikey, BuildTeamIdentifier.APIKey);
 
         if(buildTeam == null) {
             res.status(400).send({ error: 'Build Team not found' });

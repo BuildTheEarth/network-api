@@ -3,13 +3,14 @@ import Network from "../../struct/core/network.js";
 
 export async function initRoutes(app: Router, joi: any, network: Network) {
 
-    app.get('/api/teams/:apikey/continent', async function (req, res) {
+    app.get('/api/teams/:key/continent', async function (req, res) {
 
-        // Validate that the API key is a valid GUID
-        if(!network.validateAPIKey(req, res))
+        // Validate that the Key is a valid API Key or Build Team ID or Build Team Tag or BuildTeam Server ID
+        const type = await network.validateKey(req, res)
+        if(type == null)
             return;
 
-        const buildTeam = await network.getBuildTeam(req.params.apikey);
+        const buildTeam = await network.getBuildTeam(req.params.key, type);
 
         if(buildTeam == null) {
             res.status(400).send({ error: 'Build Team not found' });
