@@ -91,6 +91,11 @@ const network = new Network(plotsystemDatabase, networkDatabase);
   Joi,
   network
 );
+(await import("./routes/teams/GET_TeamID.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
 (await import("./routes/teams/GET_TeamName.js")).initRoutes(
   router,
   Joi,
