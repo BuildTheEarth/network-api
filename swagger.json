@@ -449,6 +449,31 @@
         }
       }
     },
+    "/api/teams/%KEY%/servers": {
+      "get": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Get Build Team Servers",
+        "description": "Returns the List of Servers of a Build Team Owners of BuildTheEarth.",
+        "parameters": [
+          {
+            "name": "KEY",
+            "description": "The API Key, Build Team ID, Build Team Tag, or Build Team Server of the Build Team.",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/teams/%KEY%/tag": {
       "get": {
         "tags": [

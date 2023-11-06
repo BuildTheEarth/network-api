@@ -62,9 +62,8 @@ export default class BuildTeam {
             console.log("Loading data for build team: " + this.apiKey)
 
         // Get the build team information
-        this.buildTeamInfo = await this.getBuildTeamInfoFromDatabase();
-
         this.buildTeamID = await this.getBuildTeamIDFromDatabase();
+        this.buildTeamInfo = await this.getBuildTeamInfoFromDatabase();
 
         if(this.buildTeamID == undefined || this.buildTeamID == null)
             return;
@@ -459,8 +458,20 @@ export default class BuildTeam {
     }
 
     async getBuildTeamInfoFromDatabase() {
-        const SQL = "SELECT * FROM BuildTeams WHERE APIKey = ?";
-        return await this.nwDatabase.query(SQL, [this.apiKey]);
+        let SQL = "SELECT * FROM BuildTeams WHERE APIKey = ?";
+        let result = await this.nwDatabase.query(SQL, [this.apiKey])
+
+        if(result.length == 0)
+            return null;
+
+        // Append the build team servers to the result
+        SQL = "SELECT IP, ShortName as Name FROM BuildTeamServers WHERE BuildTeam = ?";
+        let servers = await this.nwDatabase.query(SQL, this.buildTeamID);
+
+        if(servers.length > 0)
+            result[0].Servers = servers;
+
+        return result;
     }
 
 
