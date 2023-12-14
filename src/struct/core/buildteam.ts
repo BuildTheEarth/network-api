@@ -114,7 +114,26 @@ export default class BuildTeam {
         // Remove the APIKey from the object
         info.APIKey = undefined;
 
-        info.Servers = this.network.buildTeamServers.filter((server: any) => server.BuildTeam == info.ID);
+        // Check if the build team is connected to the network or not
+        // If not, get the IP of the main server and switch the servers array to only contain the main server IP
+        let servers = null;
+        if(info.Visibility == "OtherServer" && info.Description != null && info.Description.includes("Current IP:\\n")){
+            const server_IP = info.Description.split("Current IP:\\n")[1].split("\\n")[0];
+
+            if(server_IP != null){
+                info.MainServerIP = server_IP;
+                servers = [{"IP" : server_IP}]
+            }
+
+            info.isConnectedToNetwork = false;
+        }else{
+            info.isConnectedToNetwork = true;
+        }
+
+        if(servers == null)
+            info.Servers = this.network.buildTeamServers.filter((server: any) => server.BuildTeam == info.ID);
+        else
+            info.Servers = servers;
 
         // Remove BuildTeam from each server in the Servers array
         for(const server of info.Servers)
