@@ -115,7 +115,16 @@ export default class BuildTeam {
         info.APIKey = undefined;
 
         info.Servers = this.network.buildTeamServers.filter((server: any) => server.BuildTeam == info.ID);
+
+        // Remove BuildTeam from each server in the Servers array
+        for(const server of info.Servers)
+            server.BuildTeam = undefined;
+
         info.Regions = this.network.buildTeamRegions.filter((region: any) => region.BuildTeam == info.ID);
+
+        // Remove BuildTeam from each region in the Regions array
+        for(const region of info.Regions)
+            region.BuildTeam = undefined;
 
         this.buildTeamInfo = info;
 
