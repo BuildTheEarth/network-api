@@ -17,20 +17,24 @@ export enum BuildTeamIdentifier {
 export default class Network {
     private static readonly API_KEY_UPDATE_INTERVAL: number = 10; // 10 minutes
 
-    private static readonly COUNTRY_TEAMS_LIST_UPDATE_INTERVAL: number = 60 * 1; // 1 hour
+    private static readonly BUILD_TEAM_INFO_UPDATE_INTERVAL: number = 60 * 1; // 1 hour
+    private static readonly BUILD_TEAM_REGIONS_UPDATE_INTERVAL: number = 60 * 1; // 1 hour
+    private static readonly BUILD_TEAM_SERVERS_UPDATE_INTERVAL: number = 60 * 1; // 1 hour
 
     private plotsystemDatabase: DatabaseHandler;
     private networkDatabase: DatabaseHandler;
 
     private apiKeys: any[] | null = null;
-    private buildTeams = new Map();
+    private buildTeams = new Map<string, BuildTeam>();
     private plotSystem: PlotSystem;
 
     private apiKeyBuildTeamIDMap = new Map();
     private apiKeyBuildTeamTagMap = new Map();
     private apiKeyBuildTeamServerMap = new Map();
 
-    private countryTeamsList: any | null = null;
+    public buildTeamInfo: any | null = null;
+    public buildTeamRegions: any | null = null;
+    public buildTeamServers: any | null = null;
 
     private updateCacheTicks: number = 0;
 
@@ -42,7 +46,6 @@ export default class Network {
     }
 
     async updateCache(isStarting: boolean = false) {
-        this.updateCacheTicks++;
 
         if(this.apiKeys == null || this.updateCacheTicks % Network.API_KEY_UPDATE_INTERVAL == 0){
             this.apiKeys = await this.getAPIKeysFromDatabase();
@@ -71,8 +74,15 @@ export default class Network {
 
         // Update the cache for all modules
 
-        if(this.countryTeamsList != null && this.getUpdateCacheTicks() % Network.COUNTRY_TEAMS_LIST_UPDATE_INTERVAL == 0)
-            this.countryTeamsList = null;
+        if(this.buildTeamInfo != null && this.getUpdateCacheTicks() % Network.BUILD_TEAM_INFO_UPDATE_INTERVAL == 0)
+            this.buildTeamInfo = null;
+
+        if(this.buildTeamRegions != null && this.getUpdateCacheTicks() % Network.BUILD_TEAM_REGIONS_UPDATE_INTERVAL == 0)
+            this.buildTeamRegions = null;
+
+        if(this.buildTeamServers != null && this.getUpdateCacheTicks() % Network.BUILD_TEAM_SERVERS_UPDATE_INTERVAL == 0)
+            this.buildTeamServers = null;
+            
 
         this.plotSystem.updateCache();
 
@@ -81,11 +91,12 @@ export default class Network {
 
             if (buildTeam == null) continue;
 
-            buildTeam.updateCache();
+            await buildTeam.emptyCache();
 
             if (isStarting == true) bar?.tick();
         }
 
+        this.updateCacheTicks++;
 
         if(this.updateCacheTicks >= Number.MAX_SAFE_INTEGER - 100)
             this.updateCacheTicks = 0;
@@ -163,7 +174,7 @@ export default class Network {
         return this.plotsystemDatabase;
     }
 
-    async getBuildTeam(key: string, identifier: BuildTeamIdentifier): Promise<BuildTeam|null> {
+    async getBuildTeam(key: string, identifier: BuildTeamIdentifier): Promise<BuildTeam|null|undefined> {
         const api_keys = this.getAPIKeys();
 
         let apiKey = null;
@@ -193,12 +204,50 @@ export default class Network {
         return buildTeam;
     }
 
-    /** Returns information about the build team. **/
-    async getCountryTeamsList(){
-        if(this.countryTeamsList == null)
-            this.countryTeamsList = await this.getCountryTeamsListFromDatabase();
+    async loadBuildTeamInfo() {
+        if(this.buildTeamInfo != null)
+            return;
 
-        if(this.countryTeamsList == null)
+        this.buildTeamInfo = await this.getBuildTeamInfoFromDatabase();
+    }
+
+    async loadBuildTeamRegions() {
+        if(this.buildTeamRegions != null)
+            return;
+
+        this.buildTeamRegions = await this.getBuildTeamRegionsFromDatabase();
+    }
+
+    async loadBuildTeamServers() {
+        if(this.buildTeamServers != null)
+            return;
+
+        this.buildTeamServers = await this.getBuildTeamServersFromDatabase();
+    }
+
+
+    /** Returns a list with information about all BuildTeams */
+    async getBuildTeamInfo(){
+        if(this.buildTeams == null)
+            return null;
+
+        let buildTeamInfoList = [];
+
+        const teams: Iterable<BuildTeam> = this.buildTeams.values();
+        for (const buildTeam of teams) 
+            buildTeamInfoList.push(await buildTeam.getBuildTeamInfo(null));
+
+        return buildTeamInfoList;
+    }
+
+    /** Returns a list with information about the countries of all Build Teams that work on countries. 
+     * Build Teams with other RegionTypes like CITY or STATE are not included. 
+     * If no countries are found, an empty list is returned.*/
+    async getBuildTeamCountries(){
+        if(this.buildTeamRegions == null)
+            this.buildTeamRegions = await this.getBuildTeamRegionsFromDatabase();
+
+        if(this.buildTeamRegions == null)
             return null;
 
         // Read the countries.json file
@@ -206,30 +255,32 @@ export default class Network {
         const rawData = await fs.readFile(filePath, 'utf-8');
         const countriesData = JSON.parse(rawData);
 
-        let countryTeamsListCopy = JSON.parse(JSON.stringify(this.countryTeamsList));
+        let buildTeamRegionsCopy = JSON.parse(JSON.stringify(this.buildTeamRegions));
 
 
-        for (const country of countryTeamsListCopy) 
+        for (const region of buildTeamRegionsCopy) 
         for (const countryData of countriesData) 
-            if(countryData.cca3 == country.RegionCode){
+            if(region.RegionType == "COUNTRY" && countryData.cca3 == region.RegionCode){
 
                 // Add the parameters "cca2", "ccn3", "cioc", "region", "subregion", "capital", "languages", "latlng", "area", "borders" to the countryTeamsListCopy
-                country.cca2 = countryData.cca2;
-                country.ccn3 = countryData.ccn3;
-                country.cioc = countryData.cioc;
-                country.region = countryData.region;
-                country.subregion = countryData.subregion;
-                country.capital = countryData.capital;
-                country.languages = countryData.languages;
-                country.latlng = countryData.latlng;
-                country.area = countryData.area;
-                country.borders = countryData.borders;
+                region.cca2 = countryData.cca2;
+                region.ccn3 = countryData.ccn3;
+                region.cioc = countryData.cioc;
+                region.region = countryData.region;
+                region.subregion = countryData.subregion;
+                region.capital = countryData.capital;
+                region.languages = countryData.languages;
+                region.latlng = countryData.latlng;
+                region.area = countryData.area;
+                region.borders = countryData.borders;
 
                 break;
             }
         
-        return countryTeamsListCopy;
+        return buildTeamRegionsCopy;
     }
+
+
 
     /** Returns a list of all warps. If no warps are found, an empty list is returned.*/
     async getWarps(){
@@ -301,7 +352,7 @@ export default class Network {
     /* =================================================== */
 
     private async getAPIKeysFromDatabase() : Promise<string[]> {
-        const SQL = "SELECT APIKey FROM BuildTeams";
+        const SQL = "SELECT APIKey FROM BuildTeams WHERE Visibility != 'Private'";
         const result = await this.networkDatabase.query(SQL); // result: [{"APIKey":"super_cool_api_key"}]
         return result.map((row: { APIKey: string }) => row.APIKey); // result: ["super_cool_api_key"]
     }
@@ -324,9 +375,19 @@ export default class Network {
         return result.map((row: { APIKey: string }) => row.APIKey); // result: ["super_cool_api_key"]
     }
 
-    private async getCountryTeamsListFromDatabase() {
-        const SQL = "SELECT `RegionCode`, `BuildTeam`, `RegionName` FROM `BuildTeamRegions` WHERE `RegionType` = 'COUNTRY'";
+    private async getBuildTeamRegionsFromDatabase() {
+        const SQL = "SELECT * FROM `BuildTeamRegions`";
         return await this.networkDatabase.query(SQL); // result: [{"RegionCode":"ABW","BuildTeam":"m3pKPALP","RegionName":"Aruba"}]
+    }
+
+    private async getBuildTeamInfoFromDatabase() {
+        const SQL = "SELECT * FROM BuildTeams WHERE Visibility != 'Private'";
+        return await this.networkDatabase.query(SQL);
+    }
+
+    private async getBuildTeamServersFromDatabase() {
+        const SQL = "SELECT * FROM BuildTeamServers";
+        return await this.networkDatabase.query(SQL);
     }
 
     private async getWarpsFromDatabase(){

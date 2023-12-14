@@ -36,11 +36,13 @@ export default class BuildTeam {
     }
 
 
-    // Updates the cache for the build team
-    async updateCache(){
+    // Empties the cache for the build team
+    async emptyCache(){
         if(this.psDatabase.settings.debug)
-            console.log("Updating cache for build team: " + this.apiKey)
-        
+            console.log("Emptying the cache for build team: " + this.apiKey)
+
+        if(this.buildTeamInfo != null && this.network.getUpdateCacheTicks() % BuildTeam.BUILD_TEAM_INFO_UPDATE_INTERVAL == 0)
+            this.buildTeamInfo = null;
 
         if(this.psCities != null && this.network.getUpdateCacheTicks() % BuildTeam.CITY_UPDATE_INTERVAL == 0)
             this.psCities.clear();
@@ -53,9 +55,6 @@ export default class BuildTeam {
 
         if(this.psFTPConfiguration != null && this.network.getUpdateCacheTicks() % BuildTeam.FTP_CONFIGURATION_UPDATE_INTERVAL == 0)
             this.psFTPConfiguration.clear();
-
-        if(this.buildTeamInfo != null && this.network.getUpdateCacheTicks() % BuildTeam.BUILD_TEAM_INFO_UPDATE_INTERVAL == 0)
-            this.buildTeamInfo = null;
     }
 
     async loadBuildTeamData(){
@@ -65,7 +64,7 @@ export default class BuildTeam {
         // Get the build team information
         this.buildTeamID = await this.getBuildTeamIDFromDatabase();
         this.psBuildTeamID = await this.getPSBuildTeamIDFromDatabase();
-        this.buildTeamInfo = await this.getBuildTeamInfoFromDatabase();
+        this.buildTeamInfo = await this.loadBuildTeamInfo();
 
         if(this.buildTeamID == undefined || this.buildTeamID == null)
             return;
@@ -97,20 +96,49 @@ export default class BuildTeam {
     /*              BuildTeam                  */
     /* ======================================= */
 
+    async loadBuildTeamInfo(){
+        if(this.network.buildTeamInfo == null)
+            await this.network.loadBuildTeamInfo();
+        if(this.network.buildTeamRegions == null)
+            await this.network.loadBuildTeamRegions();
+        if(this.network.buildTeamServers == null)
+            await this.network.loadBuildTeamServers();
+        
+
+        // BuildTeamInfo is a json array with one object per buildteam
+        const info = this.network.buildTeamInfo.filter((info: any) => info.APIKey == this.apiKey)[0];
+
+        if(info == null)
+            return null;
+
+        // Remove the APIKey from the object
+        info.APIKey = undefined;
+
+        info.Servers = this.network.buildTeamServers.filter((server: any) => server.BuildTeam == info.ID);
+        info.Regions = this.network.buildTeamRegions.filter((region: any) => region.BuildTeam == info.ID);
+
+        this.buildTeamInfo = info;
+
+        return info;
+    }
+
     /** Returns information about the build team. 
         If key is null, all information is returned, otherwise only the information for the given key is returned. 
         If no information is found, null is returned.*/
     async getBuildTeamInfo(key: string | null){
         if(this.buildTeamInfo == null)
-            await this.loadBuildTeamData();
+            await this.loadBuildTeamInfo();
 
+        if(this.buildTeamInfo == null)
+            return null;
+            
         if(key == null)
-            return this.buildTeamInfo[0];
+            return this.buildTeamInfo;
 
-        if(!this.buildTeamInfo[0].hasOwnProperty(key))
+        if(!this.buildTeamInfo.hasOwnProperty(key))
             return null;
 
-        return this.buildTeamInfo[0][key];
+        return this.buildTeamInfo[key];
     }
 
     /** Creates a new warp for the build team.
@@ -466,23 +494,6 @@ export default class BuildTeam {
     async getPSCityReviewsFromDatabase(city_id: number){
         const SQL = "SELECT a.* FROM plotsystem_reviews as a, plotsystem_plots as b WHERE a.id = b.review_id";
         return await this.psDatabase.query(SQL, [city_id]);
-    }
-
-    async getBuildTeamInfoFromDatabase() {
-        let SQL = "SELECT * FROM BuildTeams WHERE APIKey = ?";
-        let result = await this.nwDatabase.query(SQL, [this.apiKey])
-
-        if(result.length == 0)
-            return null;
-
-        // Append the build team servers to the result
-        SQL = "SELECT IP, ShortName as Name FROM BuildTeamServers WHERE BuildTeam = ?";
-        let servers = await this.nwDatabase.query(SQL, this.buildTeamID);
-
-        if(servers.length > 0)
-            result[0].Servers = servers;
-
-        return result;
     }
 
 

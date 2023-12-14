@@ -6,7 +6,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
     app.get('/api/teams/countries', async function (req, res) {
 
         // Get a json of all countries from the DB in the specified format
-        const countries = await network.getCountryTeamsList();
+        const countries = await network.getBuildTeamCountries();
 
         if (countries == null) {
             res.status(400).send({ error: 'No countries found.' });
