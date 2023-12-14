@@ -19,6 +19,7 @@ export default class BuildTeam {
     private psDatabase: DatabaseHandler
     private nwDatabase: DatabaseHandler
 
+    private psBuildTeamID: string | null = null;
     private psCities: Map<number, any[]> = new Map() // Map<country_id, city>
     private psCountries: Map<number, any[]> = new Map() // Map<country_id, country>
     private psServers: Map<number, any[]> = new Map() // Map<server_id, server>
@@ -63,11 +64,11 @@ export default class BuildTeam {
 
         // Get the build team information
         this.buildTeamID = await this.getBuildTeamIDFromDatabase();
+        this.psBuildTeamID = await this.getPSBuildTeamIDFromDatabase();
         this.buildTeamInfo = await this.getBuildTeamInfoFromDatabase();
 
         if(this.buildTeamID == undefined || this.buildTeamID == null)
             return;
-
 
         // Update all countries, cities, servers and ftp configurations
         const countries = await this.getPSCountriesFromDatabase();
@@ -426,10 +427,20 @@ export default class BuildTeam {
 
         return result[0].btid;
     }
+
+    async getPSBuildTeamIDFromDatabase(){
+        const SQL = "SELECT plotsystem_buildteams.id FROM plotsystem_buildteams, plotsystem_api_keys WHERE plotsystem_api_keys.api_key = ? AND plotsystem_api_keys.id = plotsystem_buildteams.api_key_id";
+        const result = await this.psDatabase.query(SQL, [this.apiKey]);
+
+        if(result.length == 0)
+            return null;
+
+        return result[0].id;
+    }
     
     async getPSCountriesFromDatabase(){
         const SQL = "SELECT a.* FROM plotsystem_countries as a, plotsystem_buildteam_has_countries as b WHERE buildteam_id = ? AND a.id = b.country_id";
-        return await this.psDatabase.query(SQL, [this.buildTeamID]);
+        return await this.psDatabase.query(SQL, [this.psBuildTeamID]);
     }
 
     async getPSCitiesFromDatabase(country_id: number){
