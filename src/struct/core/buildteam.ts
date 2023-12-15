@@ -169,6 +169,11 @@ export default class BuildTeam {
         return this.buildTeamInfo[key];
     }
 
+    /** Updates the variable hasBuildTeamToolsInstalled for the Build Team */
+    async setHasBuildTeamToolsInstalled(hasBuildTeamToolsInstalled: boolean){
+        return await this.updateHasBuildTeamToolsInstalledInDatabase(hasBuildTeamToolsInstalled);
+    }
+
     /** Creates a new warp for the build team.
      * 
      * @param key The key of the warp
@@ -474,7 +479,7 @@ export default class BuildTeam {
     /*              DATABASE GET REQUESTS                  */
     /* =================================================== */
 
-    async getBuildTeamIDFromDatabase(){
+    private async getBuildTeamIDFromDatabase(){
         const SQL = "SELECT ID as btid FROM BuildTeams WHERE APIKey = ?";
         const result = await this.nwDatabase.query(SQL, [this.apiKey]);
 
@@ -484,7 +489,7 @@ export default class BuildTeam {
         return result[0].btid;
     }
 
-    async getPSBuildTeamIDFromDatabase(){
+    private async getPSBuildTeamIDFromDatabase(){
         const SQL = "SELECT plotsystem_buildteams.id FROM plotsystem_buildteams, plotsystem_api_keys WHERE plotsystem_api_keys.api_key = ? AND plotsystem_api_keys.id = plotsystem_buildteams.api_key_id";
         const result = await this.psDatabase.query(SQL, [this.apiKey]);
 
@@ -494,32 +499,32 @@ export default class BuildTeam {
         return result[0].id;
     }
     
-    async getPSCountriesFromDatabase(){
+    private async getPSCountriesFromDatabase(){
         const SQL = "SELECT a.* FROM plotsystem_countries as a, plotsystem_buildteam_has_countries as b WHERE buildteam_id = ? AND a.id = b.country_id";
         return await this.psDatabase.query(SQL, [this.psBuildTeamID]);
     }
 
-    async getPSCitiesFromDatabase(country_id: number){
+    private async getPSCitiesFromDatabase(country_id: number){
         const SQL = "SELECT * FROM plotsystem_city_projects WHERE country_id = ?";
         return await this.psDatabase.query(SQL, [country_id]);
     }
 
-    async getPSServersFromDatabase(country_id: number){
+    private async getPSServersFromDatabase(country_id: number){
         const SQL = "SELECT * FROM plotsystem_servers WHERE id = (SELECT server_id FROM plotsystem_countries WHERE id = ?)";
         return await this.psDatabase.query(SQL, [country_id]);
     }
 
-    async getPSFTPConfigurationFromDatabase(server_id: number){
+    private async getPSFTPConfigurationFromDatabase(server_id: number){
         const SQL = "SELECT * FROM plotsystem_ftp_configurations as a WHERE a.id = (SELECT ftp_configuration_id FROM plotsystem_servers as b WHERE b.id = ?)";
         return await this.psDatabase.query(SQL, [server_id]);
     }
 
-    async getPSCityPlotsFromDatabase(city_id: number){
+    private async getPSCityPlotsFromDatabase(city_id: number){
         const SQL = "SELECT * FROM plotsystem_plots WHERE city_project_id = ?";
         return await this.psDatabase.query(SQL, [city_id]);
     }
 
-    async getPSCityReviewsFromDatabase(city_id: number){
+    private async getPSCityReviewsFromDatabase(city_id: number){
         const SQL = "SELECT a.* FROM plotsystem_reviews as a, plotsystem_plots as b WHERE a.id = b.review_id";
         return await this.psDatabase.query(SQL, [city_id]);
     }
@@ -530,7 +535,7 @@ export default class BuildTeam {
     /*                DATABASE POST REQUEST                */
     /* =================================================== */
 
-    async createPSPlotInDatabase(city_project_id: number, difficulty_id: number, mc_coordinates: [number, number, number], outline: any, create_player: string, version: string){
+    private async createPSPlotInDatabase(city_project_id: number, difficulty_id: number, mc_coordinates: [number, number, number], outline: any, create_player: string, version: string){
         const SQL = "INSERT INTO plotsystem_plots (city_project_id, difficulty_id, mc_coordinates, outline, create_player, version) VALUES (?, ?, ?, ?, ?, ?)";
 
         const result = await this.psDatabase.query(SQL, [city_project_id, difficulty_id, mc_coordinates, outline, create_player, version]);
@@ -541,7 +546,7 @@ export default class BuildTeam {
             return false;
     }   
 
-    async createWarpInDatabase(ID: string, buildTeamID: string, name: string, countryCode: string, subRegion: string, city: string, worldName: string, lat: number, lon: number, height: number, yaw: number, pitch: number, isHighlight: boolean) {
+    private async createWarpInDatabase(ID: string, buildTeamID: string, name: string, countryCode: string, subRegion: string, city: string, worldName: string, lat: number, lon: number, height: number, yaw: number, pitch: number, isHighlight: boolean) {
         const SQL = "INSERT INTO BuildTeamWarps (ID, BuildTeam, Name, CountryCode, SubRegion, City, WorldName, Latitude, Longitude, Height, Yaw, Pitch, IsHighlight) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         const result = await this.nwDatabase.query(SQL, [ID, buildTeamID, name, countryCode, subRegion, city, worldName, lat, lon, height, yaw, pitch, isHighlight]);
@@ -557,7 +562,7 @@ export default class BuildTeam {
     /* =================================================== */
 
     // Updates the plot with the given plot id. If one of the parameters is null, the value in the database is not updated.
-    async updatePSPlotInDatabase(plot_id: number, city_project_id: number, difficulty_id: number, review_id: number, owner_uuid: string, member_uuids: string[], status: any, mc_coordinates: [number, number, number], outline: any, score: string, last_activity: string, pasted: string, type: string, version: string){
+    private async updatePSPlotInDatabase(plot_id: number, city_project_id: number, difficulty_id: number, review_id: number, owner_uuid: string, member_uuids: string[], status: any, mc_coordinates: [number, number, number], outline: any, score: string, last_activity: string, pasted: string, type: string, version: string){
         const SQL = "UPDATE plotsystem_plots SET city_project_id = ?, difficulty_id = ?, review_id = ?, owner_uuid = ?, member_uuids = ?, status = ?, mc_coordinates = ?, outline = ?, score = ?, last_activity = ?, pasted = ?, type = ?, version = ? WHERE id = ?";
 
         const result = await this.psDatabase.query(SQL, [city_project_id, difficulty_id, review_id, owner_uuid, member_uuids, status, mc_coordinates, outline, score, last_activity, pasted, type, version, plot_id]);
@@ -569,7 +574,7 @@ export default class BuildTeam {
     }
 
     // Updates an existing warp in the database
-    async updateWarpInDatabase(ID: string, buildTeamID: string, name: string, countryCode: string, subRegion: string, city: string, worldName: string, lat: number, lon: number, height: number, yaw: number, pitch: number, isHighlight: boolean) {
+    private async updateWarpInDatabase(ID: string, buildTeamID: string, name: string, countryCode: string, subRegion: string, city: string, worldName: string, lat: number, lon: number, height: number, yaw: number, pitch: number, isHighlight: boolean) {
         const SQL = "UPDATE BuildTeamWarps SET ID = ?, BuildTeam = ?, Name = ?, CountryCode = ?, SubRegion = ?, City = ?, WorldName = ?, Latitude = ?, Longitude = ?, Height = ?, Yaw = ?, Pitch = ?, IsHighlight = ? WHERE ID = ? AND BuildTeam = ?";
 
         const result = await this.nwDatabase.query(SQL, [ID, buildTeamID, name, countryCode, subRegion, city, worldName, lat, lon, height, yaw, pitch, isHighlight, ID, buildTeamID]);
@@ -580,13 +585,23 @@ export default class BuildTeam {
             return false;
     }
 
+    private async updateHasBuildTeamToolsInstalledInDatabase(hasBuildTeamToolsInstalled: boolean) {
+        const SQL = "UPDATE BuildTeams SET hasBuildTeamToolsInstalled = ? WHERE ID = ?";
+
+        const result = await this.nwDatabase.query(SQL, [hasBuildTeamToolsInstalled, this.buildTeamID]);
+
+        if(result.affectedRows == 1)
+            return true;
+        else 
+            return false;
+    }
 
     /* =================================================== */
     /*                DATABASE DELETE REQUEST              */
     /* =================================================== */
 
     // Deletes a warp from the database
-    async deleteWarpInDatabase(key: string) {
+    private async deleteWarpInDatabase(key: string) {
         const SQL = "DELETE FROM BuildTeamWarps WHERE (Name = ? OR ID = ?) AND BuildTeam = ?";
 
         const result = await this.nwDatabase.query(SQL, [key, key, this.buildTeamID]);

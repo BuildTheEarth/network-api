@@ -86,6 +86,11 @@ const network = new Network(plotsystemDatabase, networkDatabase);
   Joi,
   network
 );
+(await import("./routes/teams/GET_TeamHasBuildTeamToolsInstalled.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
 (await import("./routes/teams/GET_TeamHeadID.js")).initRoutes(
   router,
   Joi,
@@ -150,6 +155,11 @@ router.use(helmet());
 );
 
 // Init PUT Routes for the API
+(await import("./routes/teams/PUT_TeamHasBuildTeamToolsInstalled.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
 (await import("./routes/plotsystem/teams/PUT_Plots.js")).initRoutes(
   router,
   Joi,

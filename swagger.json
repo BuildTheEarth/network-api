@@ -249,6 +249,20 @@
         }
       }
     },
+    "/api/teams": {
+      "get": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Get all Information about all Build Teams",
+        "description": "Returns all general information about all Build Teams of BuildTheEarth.",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/teams/%KEY%": {
       "get": {
         "tags": [
@@ -342,6 +356,74 @@
             "required": true
           }
         ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/teams/%KEY%/hasBuildTeamToolsInstalled": {
+      "get": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Check if Build Team has BuildTeamTools Installed",
+        "description": "Returns a boolean if the BuildTeam has BuildTeamTools Installed https://www.spigotmc.org/resources/buildteamtools.101854/.",
+        "parameters": [
+          {
+            "name": "KEY",
+            "description": "The API Key, Build Team ID, Build Team Tag, or Build Team Server of the Build Team.",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Updates the variable hasBuildTeamToolsInstalled",
+        "description": "This route is used by the BuildTeamTools plugin to tell that its installed on the build team server.",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                    "hasBuildTeamToolsInstalled": {
+                        "type": "boolean",
+                        "description": "The variable that gets changed.",
+                        "required": true
+                    }
+                },
+                "example": [
+                  {
+                    "hasBuildTeamToolsInstalled": true
+                  }
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Success"
