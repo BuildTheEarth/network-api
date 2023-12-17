@@ -382,7 +382,12 @@ export default class BuildTeam {
         if(this.psFTPConfiguration == null || this.psFTPConfiguration.size == 0)
             await this.loadBuildTeamData();
 
-        return this.psFTPConfiguration;        
+        const ftpConfigJSON: any = {};
+
+        for(const [server_id, ftp_config] of this.psFTPConfiguration.entries())
+            ftpConfigJSON[server_id] = ftp_config;
+
+        return ftpConfigJSON;        
     }
 
     // Returns an uncached list of plots of this team. If no plots are found, an empty list is returned.

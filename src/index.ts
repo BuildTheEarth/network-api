@@ -38,6 +38,11 @@ const network = new Network(plotsystemDatabase, networkDatabase);
   Joi,
   network
 );
+(await import("./routes/plotsystem/teams/GET_FTP_Config.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
 (await import("./routes/plotsystem/teams/GET_Plots.js")).initRoutes(
   router,
   Joi,

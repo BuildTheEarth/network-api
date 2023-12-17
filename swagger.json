@@ -57,7 +57,7 @@
         "tags": [
           "Global Plot System"
         ],
-        "summary": "Get All Plot System Cities of a Team",
+        "summary": "Get All Plot System Cities of a Build Team",
         "description": "Returns the cities of a Build Team that are available in the global plot system.",
         "parameters": [
           {
@@ -81,7 +81,31 @@
         "tags": [
           "Global Plot System"
         ],
-        "summary": "Get All Plot System Countries of a Team",
+        "summary": "Get All Plot System Countries of a Build Team",
+        "description": "Returns the countries of a Build Team that are available in the global plot system.",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/plotsystem/teams/%API_KEY%/ftp": {
+      "get": {
+        "tags": [
+          "Global Plot System"
+        ],
+        "summary": "Get Plot System FTP Configuration of a Build Team",
         "description": "Returns the countries of a Build Team that are available in the global plot system.",
         "parameters": [
           {
@@ -105,7 +129,7 @@
         "tags": [
           "Global Plot System"
         ],
-        "summary": "Get All Plots of a Team",
+        "summary": "Get All Plots of a Build Team",
         "description": "Returns the plots of a Build Team that are available in the global plot system.",
         "parameters": [
           {
