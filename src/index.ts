@@ -58,6 +58,11 @@ const network = new Network(plotsystemDatabase, networkDatabase);
   Joi,
   network
 );
+(await import("./routes/plotsystem/teams/orders/GET_Confirm_Order.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
 
 // Teams Imports
 

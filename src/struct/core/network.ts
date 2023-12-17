@@ -315,6 +315,31 @@ export default class Network {
         return true;
     }
 
+     // Validate an API key and an Order ID that look like this "fffb262b-0324-499a-94a6-eebf845e6123"
+     validateAPIKeyAndOrderID(req: express.Request, res: express.Response): boolean {
+        // Validate that the API key and the oOder ID is a valid GUID
+        const schema = joi.object().keys({
+            apikey: joi.string().guid().required(),
+            orderId: joi.string().guid().required(),
+        });
+
+        const result = schema.validate(req.params);
+        if (result.error) {
+            res.status(400).send(result.error.details[0].message);
+            return false;
+        }
+
+        //Validate that the API key exists in the plot system database
+        const api_keys = this.getAPIKeys();
+
+        if (!api_keys.includes(req.params.apikey)) {
+            res.status(401).send({ success: false, error: "Invalid API key" });
+            return false;
+        }
+
+        return true;
+    }
+
     // Validate a key that is either an API Key or a Build Team ID or a Build Team Tag or a BuildTeam Server ID
     async validateKey(req: express.Request, res: express.Response): Promise<BuildTeamIdentifier|null> {
         const apiKeys = this.getAPIKeys();

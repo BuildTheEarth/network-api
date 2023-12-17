@@ -45,6 +45,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
             const mc_coordinates = req.body[i].mc_coordinates;
             const outline = req.body[i].outline;
             const version = req.body[i].version;
+            const is_order = req.body[i].is_order;
             let createPlayer = "API";
 
             if(req.body.create_player != null)
@@ -59,20 +60,27 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
 
 
              // Create the plot in the database
-            const promise = buildTeam.createPSPlot(city_project_id, difficulty_id, mc_coordinates, outline, createPlayer, version);
+            const promise = buildTeam.createPSPlot(is_order, city_project_id, difficulty_id, mc_coordinates, outline, createPlayer, version);
 
 
             // Wait for the promise to resolve
             promise.then((success) => {
                     // If the plot was not created, return an error
-                    if(!success){
+                    if(success == -1){
                         res.status(400).send({success: false, error: 'An error occurred while creating the plot'});
                         return;
+                    }else if(success == -2){
+                        res.status(400).send({success: false, error: 'The city with the specified ID does not exist'});
+                        return;
+                    }else if(success == 0){
+                        // Return the success message to the client
+                        res.setHeader('Content-Type', 'application/json');
+                        res.send({success: true})
+                    }else{
+                        // Return the order id to the client
+                        res.setHeader('Content-Type', 'application/json');
+                        res.send({success: true, order_id: success})
                     }
-
-                    // Return the success message to the client
-                    res.setHeader('Content-Type', 'application/json');
-                    res.send({success: true})
             })
         }
 

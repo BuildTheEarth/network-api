@@ -4,6 +4,23 @@ import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs/promises';
 import path from 'path';
 
+interface Plot {
+    id: number,
+    city_project_id: number,
+    difficulty_id: number,
+    review_id: number,
+    owner_uuid: string,
+    member_uuids: string[],
+    status: any,
+    mc_coordinates: [number, number, number],
+    outline: any,
+    score: string,
+    last_activity: string,
+    pasted: string,
+    type: string,
+    version: string,
+    create_player: string
+}
 
 export default class BuildTeam {
     private static readonly CITY_UPDATE_INTERVAL: number = 60 * 24; // 24 hours
@@ -11,7 +28,6 @@ export default class BuildTeam {
     private static readonly SERVER_UPDATE_INTERVAL: number = 60 * 24; // 24 hours
     private static readonly FTP_CONFIGURATION_UPDATE_INTERVAL: number = 60 * 24; // 24 hours
     private static readonly BUILD_TEAM_INFO_UPDATE_INTERVAL: number = 60 * 1; // 1 hour
-
 
     private apiKey: string;
     private buildTeamID: string | null = null;
@@ -24,6 +40,7 @@ export default class BuildTeam {
     private psCountries: Map<number, any[]> = new Map() // Map<country_id, country>
     private psServers: Map<number, any[]> = new Map() // Map<server_id, server>
     private psFTPConfiguration: Map<number, any[]> = new Map(); // Map<server_id, ftp_configuration>
+    private psTmpPlots: Map<string, {}> = new Map(); // Map<order_id, plot>
 
     private buildTeamInfo: any | null = null;
 
@@ -438,14 +455,60 @@ export default class BuildTeam {
         return await this.getPSCityPlotsFromDatabase(city_id);        
     }
 
-    // Creates a new plot for the given city id. If the city id is not found, false is returned.
-    async createPSPlot(city_project_id: number, difficulty_id: number, mc_coordinates: [number, number, number], outline: any, create_player: string, version: string){
+    /** Creates a new plot for the given city id. If the city id is not found, false is returned. 
+     * 
+     * @param is_order Whether the plot needs confirmation or not. If true, the plot is not created and an order id is returned instead.
+     * 
+     * @returns Returns 0 if success, -2 if the city id is not found, -1 if the plot was not created, otherwise the order id of the plot.
+     * */ 
+    async createPSPlot(is_order: boolean, city_project_id: number, difficulty_id: number, mc_coordinates: [number, number, number], outline: any, create_player: string, version: string): Promise<string | number>{
         const cities = await this.getPSCities();
         
         if(!cities.some(city => city.id == city_project_id))
+            return -2;
+
+        if(!is_order)
+            return await this.createPSPlotInDatabase(city_project_id, difficulty_id, mc_coordinates, outline, create_player, version) ? 0 : -1;
+        else{
+            const tmpPlot = {
+                city_project_id: city_project_id,
+                difficulty_id: difficulty_id,
+                mc_coordinates: mc_coordinates,
+                outline: outline,
+                create_player: create_player,
+                version: version
+            }
+            
+            // Create random order uuid
+            let order_id = uuidv4();
+
+            // Make sure the order id is not already in use
+            while(this.psTmpPlots.has(order_id))
+                order_id = uuidv4();
+
+            this.psTmpPlots.set(order_id, tmpPlot);  
+            
+            return order_id;
+        }
+    }
+
+    async confirmPSOrder(order_id: string): Promise<boolean>{
+        if(!this.psTmpPlots.has(order_id))
             return false;
 
-        return await this.createPSPlotInDatabase(city_project_id, difficulty_id, mc_coordinates, outline, create_player, version);
+        const tmpPlotJSON: {} | undefined = this.psTmpPlots.get(order_id);
+
+        if (tmpPlotJSON == null)
+            return false;
+
+        const tmpPlot: Plot = tmpPlotJSON as Plot;
+
+        const success = await this.createPSPlotInDatabase(tmpPlot.city_project_id, tmpPlot.difficulty_id, tmpPlot.mc_coordinates, tmpPlot.outline, tmpPlot.create_player, tmpPlot.version);
+
+        if(success)
+            this.psTmpPlots.delete(order_id);
+
+        return success;
     }
 
     // Updates the plot with the given plot id. If the plot id is not found, false is returned.

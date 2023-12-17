@@ -124,6 +124,38 @@
         }
       }
     },
+    "/api/plotsystem/teams/%API_KEY%/orders/%%ORDER_ID%%/confirm": {
+      "get": {
+        "tags": [
+          "Global Plot System"
+        ],
+        "summary": "Confirms a Plot Order",
+        "description": "Confirms a plot order of a Build Team in the global plot system. This will created the ordered plots afterwards.",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "order_id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/plotsystem/teams/%API_KEY%/plots": {
       "get": {
         "tags": [
@@ -152,7 +184,7 @@
           "Global Plot System"
         ],
         "summary": "Create a Plot for a Build Team",
-        "description": "Saved the plot details for a new plot of a Build Team in the global plot system.",
+        "description": "Saved the plot details for a new plot of a Build Team in the global plot system. If is_order is true, the plot will be added to the order queue.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -164,7 +196,8 @@
                     "difficulty_id": 1,
                     "mc_coordinates": "3190699.5,690.5,-4673990.0",
                     "outline": "4078352.0,-4550687.0|4078371.0,-4550675.0|4078370.0,-4550669.0|4078371.0,-4550668.0|4078371.0,-4550666.0|4078355.0,-4550635.0|4078348.0,-4550633.0|4078334.0,-4550642.0|4078328.0,-4550656.0|4078329.0,-4550655.0|4078351.0,-4550683.0",
-                    "version": 3
+                    "version": 3,
+                    "is_order": false
                   }
                 ]
               }
