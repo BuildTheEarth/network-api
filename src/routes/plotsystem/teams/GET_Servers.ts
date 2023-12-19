@@ -9,8 +9,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         if(!network.validateAPIKey(req, res))
             return;
         
-
-            const buildTeam = await network.getBuildTeam(req.params.apikey, BuildTeamIdentifier.APIKey);
+        const buildTeam = await network.getBuildTeam(req.params.apikey, BuildTeamIdentifier.APIKey);
 
         if(buildTeam == null) {
             res.status(400).send({ error: 'Build Team not found' });

@@ -20,17 +20,17 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
             return;
         }
         
-        const success = await buildTeam.confirmPSOrder(req.params.orderId);
+        const result = await buildTeam.confirmPSOrder(req.params.orderId);
 
         res.setHeader('Content-Type', 'application/json');
 
-        if(!success){
+        if(!result){
             res.status(400).send({success: false, error: 'An error occurred while creating the plot'});
             return;
         }
 
-        // Return the success message to the client
-        res.send({success: true})
+        // Return the success message to the client including the plotID
+        res.send({success: true, plot_id: result.toString()})
     })
 
 }

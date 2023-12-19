@@ -60,33 +60,26 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
 
 
              // Create the plot in the database
-            const promise = buildTeam.createPSPlot(is_order, city_project_id, difficulty_id, mc_coordinates, outline, createPlayer, version);
+            const result = await buildTeam.createPSPlot(is_order, city_project_id, difficulty_id, mc_coordinates, outline, createPlayer, version);
 
-
-            // Wait for the promise to resolve
-            promise.then((success) => {
-                    // If the plot was not created, return an error
-                    if(success == -1){
-                        res.status(400).send({success: false, error: 'An error occurred while creating the plot'});
-                        return;
-                    }else if(success == -2){
-                        res.status(400).send({success: false, error: 'The city with the specified ID does not exist'});
-                        return;
-                    }else if(success == 0){
-                        // Return the success message to the client
-                        res.setHeader('Content-Type', 'application/json');
-                        res.send({success: true})
-                    }else{
-                        // Return the order id to the client
-                        res.setHeader('Content-Type', 'application/json');
-                        res.send({success: true, order_id: success})
-                    }
-            })
-        }
-
-
-
-       
+            // If the plot was not created, return an error
+            if(result == -1){
+                res.status(400).send({success: false, error: 'An error occurred while creating the plot'});
+                return;
+            }else if(result == -2){
+                res.status(400).send({success: false, error: 'The city with the specified ID does not exist'});
+                return;
+            }else if(!is_order){
+                // Return the plot id to the client
+                res.setHeader('Content-Type', 'application/json');
+                res.send({success: true, plot_id: result.toString()})
+            }else{
+                // Return the order id to the client
+                res.setHeader('Content-Type', 'application/json');
+                res.send({success: true, order_id: result.toString()})
+            }
+        
+        }       
     })
 
 }

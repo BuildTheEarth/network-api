@@ -467,9 +467,14 @@ export default class BuildTeam {
         if(!cities.some(city => city.id == city_project_id))
             return -2;
 
-        if(!is_order)
-            return await this.createPSPlotInDatabase(city_project_id, difficulty_id, mc_coordinates, outline, create_player, version) ? 0 : -1;
-        else{
+        if(!is_order){
+            const result = await this.createPSPlotInDatabase(city_project_id, difficulty_id, mc_coordinates, outline, create_player, version);
+
+            if(result == false)
+                return -1;
+            else
+                return result;
+        }else{
             const tmpPlot = {
                 city_project_id: city_project_id,
                 difficulty_id: difficulty_id,
@@ -492,7 +497,7 @@ export default class BuildTeam {
         }
     }
 
-    async confirmPSOrder(order_id: string): Promise<boolean>{
+    async confirmPSOrder(order_id: string): Promise<number | false>{
         if(!this.psTmpPlots.has(order_id))
             return false;
 
@@ -603,13 +608,13 @@ export default class BuildTeam {
     /*                DATABASE POST REQUEST                */
     /* =================================================== */
 
-    private async createPSPlotInDatabase(city_project_id: number, difficulty_id: number, mc_coordinates: [number, number, number], outline: any, create_player: string, version: string){
+    private async createPSPlotInDatabase(city_project_id: number, difficulty_id: number, mc_coordinates: [number, number, number], outline: any, create_player: string, version: string): Promise<number | false>{
         const SQL = "INSERT INTO plotsystem_plots (city_project_id, difficulty_id, mc_coordinates, outline, create_player, version) VALUES (?, ?, ?, ?, ?, ?)";
 
         const result = await this.psDatabase.query(SQL, [city_project_id, difficulty_id, mc_coordinates, outline, create_player, version]);
 
         if(result.affectedRows == 1)
-            return true;
+            return result.insertId;
         else 
             return false;
     }   
