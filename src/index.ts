@@ -187,6 +187,11 @@ router.use(helmet());
   Joi,
   network
 );
+(await import("./routes/plotsystem/teams/DELETE_Plot.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
 
 
 // A timer that runs every 1 minute

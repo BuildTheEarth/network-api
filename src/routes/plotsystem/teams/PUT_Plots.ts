@@ -36,8 +36,6 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
                 return;
             }
 
-            console.log(plot);
-
             // Get the parameters from the request
             let cityProjectID = plot.city_project_id;
             let difficultyID = plot.difficulty_id;

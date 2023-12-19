@@ -524,6 +524,14 @@ export default class BuildTeam {
         return await this.updatePSPlotInDatabase(plot_id, city_project_id, difficulty_id, review_id, owner_uuid, member_uuids, status, mc_coordinates, outline, score, last_activity, pasted, type, version);
     }
 
+    // Deletes the plot with the given plot id. If the plot id is not found, false is returned.
+    async deletePSPlot(plot_id: number){
+        if(!this.isValidPSPlot(plot_id))
+            return false;
+
+        return await this.deletePSPlotInDatabase(plot_id);
+    }
+
     // Returns an uncached list of reviews.
     async getPSReviews(){
         if(this.psCities == null || this.psCities.size == 0)
@@ -678,6 +686,18 @@ export default class BuildTeam {
         const SQL = "DELETE FROM BuildTeamWarps WHERE (Name = ? OR ID = ?) AND BuildTeam = ?";
 
         const result = await this.nwDatabase.query(SQL, [key, key, this.buildTeamID]);
+
+        if(result.affectedRows == 1)
+            return true;
+        else 
+            return false;
+    }
+
+    // Deletes a plot from the database
+    private async deletePSPlotInDatabase(plot_id: number){
+        const SQL = "DELETE FROM plotsystem_plots WHERE id = ?";
+
+        const result = await this.psDatabase.query(SQL, [plot_id]);
 
         if(result.affectedRows == 1)
             return true;

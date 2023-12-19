@@ -224,7 +224,7 @@
         "tags": [
           "Global Plot System"
         ],
-        "summary": "Update  a Plot of a Build Team",
+        "summary": "Update a Plot of a Build Team",
         "description": "Changes the plot details of a plot of a Build Team in the global plot system.",
         "requestBody": {
           "content": {
@@ -235,6 +235,42 @@
                   {
                     "id": 1,
                     "status": "I love MineFact"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Global Plot System"
+        ],
+        "summary": "Delete a Plot from a Build Team",
+        "description": "Deletes a plot from a Build Team in the global plot system.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": [
+                  {
+                    "id": 1
                   }
                 ]
               }
