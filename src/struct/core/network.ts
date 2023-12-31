@@ -215,7 +215,7 @@ export default class Network {
         if(this.buildTeamRegions != null)
             return;
 
-        this.buildTeamRegions = await this.getBuildTeamRegionsFromDatabase();
+        this.buildTeamRegions = await this.getBuildTeamRegions();
     }
 
     async loadBuildTeamServers() {
@@ -245,6 +245,21 @@ export default class Network {
      * If no countries are found, an empty list is returned.*/
     async getBuildTeamCountries(){
         if(this.buildTeamRegions == null)
+            this.getBuildTeamRegions();
+
+        if(this.buildTeamRegions == null)
+            return null;
+
+        let buildTeamRegionsCopy = JSON.parse(JSON.stringify(this.buildTeamRegions));
+
+        // Remove all regions that are not countries
+        buildTeamRegionsCopy = buildTeamRegionsCopy.filter((region: { RegionType: string; }) => region.RegionType == "COUNTRY");
+        
+        return buildTeamRegionsCopy;
+    }
+
+    async getBuildTeamRegions(){
+        if(this.buildTeamRegions == null)
             this.buildTeamRegions = await this.getBuildTeamRegionsFromDatabase();
 
         if(this.buildTeamRegions == null)
@@ -260,7 +275,7 @@ export default class Network {
 
         for (const region of buildTeamRegionsCopy) 
         for (const countryData of countriesData) 
-            if(region.RegionType == "COUNTRY" && countryData.cca3 == region.RegionCode){
+            if(countryData.cca3 == region.RegionCode){
 
                 // Add the parameters "cca2", "ccn3", "cioc", "region", "subregion", "capital", "languages", "latlng", "area", "borders" to the countryTeamsListCopy
                 region.cca2 = countryData.cca2;
@@ -279,6 +294,7 @@ export default class Network {
         
         return buildTeamRegionsCopy;
     }
+
 
 
 
