@@ -275,7 +275,7 @@ export default class Network {
 
         for (const region of buildTeamRegionsCopy) 
         for (const countryData of countriesData) 
-            if(countryData.cca3 == region.RegionCode){
+            if(region.RegionType == "COUNTRY" && countryData.cca3 == region.RegionCode){
 
                 // Add the parameters "cca2", "ccn3", "cioc", "region", "subregion", "capital", "languages", "latlng", "area", "borders" to the countryTeamsListCopy
                 region.cca2 = countryData.cca2;
