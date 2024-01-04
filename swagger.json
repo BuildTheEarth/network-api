@@ -508,11 +508,9 @@
                         "required": true
                     }
                 },
-                "example": [
-                  {
-                    "hasBuildTeamToolsInstalled": true
-                  }
-                ]
+                "example": {
+                  "hasBuildTeamToolsInstalled": true
+                }
               }
             }
           }

@@ -32,34 +32,29 @@ export default class DatabaseHandler {
     });
   }
 
-  public async query(sql: string, params: any = null) {
-    // Get a connection from the pool
-    const conn = await this.pool.getConnection().catch((err) => {
-      console.log(
-        "There was an error when creating the connection. Please retry. Error:"
-      );
-      console.log(err);
-    });
+  public async query(sql: string, params: any = null){
+    let conn;
+    try {
+        // Get a connection from the pool
+        conn = await this.pool.getConnection();
 
-    if (!conn) return [];
+        // Execute the query
+        let result: any = await conn.query(sql, params);
 
-    // Execute the query
-    let rows = await conn
-      .query(sql, params)
-      .catch((err) => {
-        console.log("There was an error when executing a SQL query. Error:");
+        if (this.settings.debug) 
+            console.log("Query executed. (" + sql + "). Params: " + params + "");
+
+        // Return rows and no error
+        return result;
+    } catch (err) {
+        console.log("There was an error in the database operation. Error:");
         console.log(err);
-        conn.release();
-        return [];
-      })
-      .finally(() => {
-        if (this.settings.debug)
-          console.log("Query executed. (" + sql + "). Params: " + params + "");
 
-        // Release the connection back to the pool
-        conn.release();
-      });
-
-    return rows;
-  }
+        // Return no rows and the error
+        return err ;
+    } finally {
+        // Release the connection back to the pool, if it was acquired
+        if (conn) conn.release();
+    }
+}
 }

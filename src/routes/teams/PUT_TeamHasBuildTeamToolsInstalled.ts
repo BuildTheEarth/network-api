@@ -29,16 +29,6 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
             return;
         }
 
-        // Get the current warp
-        const warps = await buildTeam.getWarps();
-        const warp = warps.find((warp: any) => warp.ID == req.body.ID);
-
-        // If the warp was not found, return an error
-        if(warp == null){
-            res.status(400).send({success: false, error: 'Warp not found in this team.'});
-            return;
-        }
-
         // Get the parameters from the request
         let hasBuildTeamToolsInstalled = req.body.hasBuildTeamToolsInstalled;   // The new value of the variable hasBuildTeamToolsInstalled
 
@@ -47,10 +37,10 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
 
 
         // Wait for the promise to resolve
-        promise.then((success) => {
+        promise.then((result: any) => {
             // If the variable was not updated, return an error
-            if(!success){
-                res.status(400).send({success: false, error: 'An error occurred while updating the variable hasBuildTeamToolsInstalled'});
+            if(result != true){
+                res.status(400).send({success: false, error: 'An error occurred while updating the variable hasBuildTeamToolsInstalled: ' + result});
                 return;
             }
 

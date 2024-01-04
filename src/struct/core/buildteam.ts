@@ -187,7 +187,13 @@ export default class BuildTeam {
     }
 
     /** Updates the variable hasBuildTeamToolsInstalled for the Build Team */
-    async setHasBuildTeamToolsInstalled(hasBuildTeamToolsInstalled: boolean){
+    async setHasBuildTeamToolsInstalled(hasBuildTeamToolsInstalled: boolean) : Promise<any>{
+        // Validate that the build team id is loaded
+        if(this.buildTeamID == null)
+            await this.loadBuildTeamData();
+        if(this.buildTeamID == null)
+            return Promise<"Build Team ID could not be loaded">;
+
         return await this.updateHasBuildTeamToolsInstalledInDatabase(hasBuildTeamToolsInstalled);
     }
 
@@ -666,7 +672,7 @@ export default class BuildTeam {
             return false;
     }
 
-    private async updateHasBuildTeamToolsInstalledInDatabase(hasBuildTeamToolsInstalled: boolean) {
+    private async updateHasBuildTeamToolsInstalledInDatabase(hasBuildTeamToolsInstalled: boolean) : Promise<boolean | string> {
         const SQL = "UPDATE BuildTeams SET hasBuildTeamToolsInstalled = ? WHERE ID = ?";
 
         const result = await this.nwDatabase.query(SQL, [hasBuildTeamToolsInstalled, this.buildTeamID]);
@@ -674,7 +680,7 @@ export default class BuildTeam {
         if(result.affectedRows == 1)
             return true;
         else 
-            return false;
+            return this.buildTeamID + " " + hasBuildTeamToolsInstalled;
     }
 
     /* =================================================== */
