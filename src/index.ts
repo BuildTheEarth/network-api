@@ -141,6 +141,11 @@ const network = new Network(plotsystemDatabase, networkDatabase);
   Joi,
   network
 );
+(await import("./routes/internal/GET_Stats.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
 
 
 // Use the body-parser middleware
@@ -197,7 +202,7 @@ router.use(helmet());
 // A timer that runs every 1 minute
 setInterval(() => {
   network.updateCache();
-}, 1 * 60 * 1000);
+}, 1000 * 60);
 
 app.use("/", router);
 

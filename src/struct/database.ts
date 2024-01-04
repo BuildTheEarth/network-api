@@ -14,6 +14,7 @@ export default class DatabaseHandler {
   public databaseSettings!: Database;
   public settings: Settings;
   private pool!: mariadb.Pool;
+  private sqlQueryCount: number = 0;
 
   constructor(settings: Settings, databaseSettings: Database) {
     this.databaseSettings = databaseSettings;
@@ -44,6 +45,8 @@ export default class DatabaseHandler {
         if (this.settings.debug) 
             console.log("Query executed. (" + sql + "). Params: " + params + "");
 
+        this.sqlQueryCount++;
+
         // Return rows and no error
         return result;
     } catch (err) {
@@ -56,5 +59,9 @@ export default class DatabaseHandler {
         // Release the connection back to the pool, if it was acquired
         if (conn) conn.release();
     }
-}
+  }
+
+  public getSQLQueryCount(): number{
+    return this.sqlQueryCount;
+  }
 }

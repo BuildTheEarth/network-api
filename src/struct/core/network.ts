@@ -174,6 +174,18 @@ export default class Network {
         return this.plotsystemDatabase;
     }
 
+    getStats(): any {
+        return {
+            time: new Date().getTime(),
+            runningFor: process.uptime(),
+            memoryUsage: process.memoryUsage(),
+            updateCacheTicks: this.updateCacheTicks,
+            apiKeysCount: this.apiKeys == null ? 0 : this.apiKeys.length,
+            buildTeamCount: this.buildTeams.size,
+            sqlQueryCount: this.networkDatabase.getSQLQueryCount(),
+        };
+    }
+
     async getBuildTeam(key: string, identifier: BuildTeamIdentifier): Promise<BuildTeam|null|undefined> {
         const api_keys = this.getAPIKeys();
 

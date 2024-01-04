@@ -52,6 +52,12 @@ export default class BuildTeam {
         this.nwDatabase = network.getNetworkDatabase();
     }
 
+    getBuildTeamID(){
+        if(this.buildTeamID == null)
+            this.loadBuildTeamData();
+
+        return this.buildTeamID;
+    }
 
     // Empties the cache for the build team
     async emptyCache(){
