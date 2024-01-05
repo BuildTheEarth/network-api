@@ -34,6 +34,11 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
 
         console.log("Step 6");
 
+        console.log(validation.error)
+        console.log(validation.error.details[0].message)
+        console.log(req.body.hasBuildTeamToolsInstalled)
+        console.log(req.body)
+
         // If the validation failed, return an error
         if(validation.error != null){
             res.status(400).send({success: false, error: validation.error.details[0].message});
