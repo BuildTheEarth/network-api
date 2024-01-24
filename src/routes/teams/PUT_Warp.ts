@@ -18,9 +18,9 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
 
         // Validate the parameters with joi
         const schema = joi.object({
-            ID: joi.string().required(),
+            id: joi.string().required(),
 
-            key: joi.string().optional(),
+            name: joi.string().optional(),
             countryCode: joi.string().optional(),
             countryCodeType: joi.string().optional().valid('cca2', 'cca3', 'ccn3', 'cioc'),
             subRegion: joi.string().optional(),
@@ -46,7 +46,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
 
         // Get the current warp
         const warps = await buildTeam.getWarps();
-        const warp = warps.find((warp: any) => warp.ID == req.body.ID);
+        const warp = warps.find((warp: any) => warp.ID == req.body.id);
 
         // If the warp was not found, return an error
         if(warp == null){
@@ -55,8 +55,8 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         }
 
         // Get the parameters from the request
-        let ID = req.body.ID;                   // The ID of the warp.
-        let key = warp.Name;                    // The key of the warp.
+        let id = warp.ID;                       // The ID of the warp.
+        let name = warp.Name;                   // The name of the warp.
         let countryCode = warp.CountryCode;     // Country Code that matches the countryCodeType.
         let countryCodeType = "cca3";           // Country Code Type like cca2, cca3, ccn3, or cioc.
         let subRegion = warp.SubRegion;         // Name of the the subregion like state or province.
@@ -73,10 +73,10 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
 
 
         // If the parameter was specified, set it
-        if(req.body.ID != null)
-            ID = req.body.ID;
-        if(req.body.key != null)
-            key = req.body.key;
+        if(req.body.id != null)
+            id = req.body.id;
+        if(req.body.name != null)
+            name = req.body.name;
         if(req.body.countryCode != null)
             countryCode = req.body.countryCode;
         if(req.body.countryCodeType != null)
@@ -102,7 +102,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
 
 
         // Update the warp
-        const promise = buildTeam.updateWarp(ID, key, countryCode, countryCodeType, subRegion, city, worldName, lat, lon, y, yaw, pitch, isHighlight);
+        const promise = buildTeam.updateWarp(id, name, countryCode, countryCodeType, subRegion, city, worldName, lat, lon, y, yaw, pitch, isHighlight);
 
 
         // Wait for the promise to resolve

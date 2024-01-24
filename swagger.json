@@ -721,9 +721,9 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                    "key": {
+                    "name": {
                         "type": "string",
-                        "description": "The key of the warp."
+                        "description": "The name of the warp."
                     },
                     "countryCode": {
                         "type": "string",
@@ -774,7 +774,8 @@
                 },
                 "example": [
                   {
-                    "key": "My Test Warp",
+                    "id": "cf0d3acb-e3df-4cdf-9960-d5e90aadf165",
+                    "name": "My Test Warp",
                     "countryCode": "276",
                     "countryCodeType": "ccn3",
                     "subRegion": "Hesse",
@@ -820,14 +821,14 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                    "ID": {
+                    "id": {
                         "type": "string",
                         "description": "The ID of the warp.",
                         "required": true
                     },
-                    "key": {
+                    "name": {
                         "type": "string",
-                        "description": "The key of the warp.",
+                        "description": "The name of the warp.",
                         "required": false
                     },
                     "countryCode": {
@@ -901,8 +902,8 @@
                 },
                 "example": [
                   {
-                    "ID": "cf0d3acb-e3df-4cdf-9960-d5e90aadf167",
-                    "key": "New Warp Name",
+                    "id": "cf0d3acb-e3df-4cdf-9960-d5e90aadf167",
+                    "name": "New Warp Name",
                     "yaw": 180
                   }
                 ]

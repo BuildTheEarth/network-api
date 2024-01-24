@@ -205,7 +205,8 @@ export default class BuildTeam {
 
     /** Creates a new warp for the build team.
      * 
-     * @param key The key of the warp
+     * @param id The ID of the warp
+     * @param name The key of the warp
      * @param countryCode Country Code that matches the countryCodeType
      * @param countryCodeType Country Code Type like cca2, cca3, ccn3, or cioc
      * @param subRegion Name of the the subregion like state or province.
@@ -220,8 +221,10 @@ export default class BuildTeam {
      * 
      * @returns Returns true if the warp was created successfully, otherwise false.
      **/
-    async createWarp(key: string, countryCode: string, countryCodeType: string, subRegion: string, city: string, worldName: string, lat: number, lon: number, y: number, yaw: number, pitch: number, isHighlight: boolean) {
-        const randomId: string = uuidv4();
+    async createWarp(id: string|null, name: string, countryCode: string, countryCodeType: string, subRegion: string, city: string, worldName: string, lat: number, lon: number, y: number, yaw: number, pitch: number, isHighlight: boolean) {
+        // Generate a new uuid if the id is null
+        if(id == null)
+            id = uuidv4();        
 
         // Validate that the build team id is loaded
         if(this.buildTeamID == null)
@@ -257,7 +260,7 @@ export default class BuildTeam {
                 return false;
         }
         
-        return await this.createWarpInDatabase(randomId, this.buildTeamID, key, finalCountryCode, subRegion, city, worldName, lat, lon, y, yaw, pitch, isHighlight);
+        return await this.createWarpInDatabase(id, this.buildTeamID, name, finalCountryCode, subRegion, city, worldName, lat, lon, y, yaw, pitch, isHighlight);
     }
 
 
