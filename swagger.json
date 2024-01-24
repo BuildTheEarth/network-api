@@ -721,6 +721,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                    "warpGroupID": {
+                        "type": "string",
+                        "description": "The ID of the warp group."
+                    },
                     "name": {
                         "type": "string",
                         "description": "The name of the warp."
@@ -774,7 +778,7 @@
                 },
                 "example": [
                   {
-                    "id": "cf0d3acb-e3df-4cdf-9960-d5e90aadf165",
+                    "warpGroupID": "b80196c1-7754-428c-808c-0bcde821e4ed",
                     "name": "My Test Warp",
                     "countryCode": "276",
                     "countryCodeType": "ccn3",
@@ -825,6 +829,11 @@
                         "type": "string",
                         "description": "The ID of the warp.",
                         "required": true
+                    },
+                    "warpGroupID": {
+                        "type": "string",
+                        "description": "The ID of the warp group.",
+                        "required": false
                     },
                     "name": {
                         "type": "string",

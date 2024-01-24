@@ -19,6 +19,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         // Validate the parameters with joi
         const schema = joi.object({
             id: joi.string().required(),
+            warpGroupID: joi.string().optional(),
 
             name: joi.string().optional(),
             countryCode: joi.string().optional(),
@@ -56,6 +57,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
 
         // Get the parameters from the request
         let id = warp.ID;                       // The ID of the warp.
+        let warpGroupID = warp.WarpGroupID;     // The ID of the warp group.
         let name = warp.Name;                   // The name of the warp.
         let countryCode = warp.CountryCode;     // Country Code that matches the countryCodeType.
         let countryCodeType = "cca3";           // Country Code Type like cca2, cca3, ccn3, or cioc.
@@ -75,6 +77,8 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         // If the parameter was specified, set it
         if(req.body.id != null)
             id = req.body.id;
+        if(req.body.warpGroupID != null)
+            warpGroupID = req.body.warpGroupID;
         if(req.body.name != null)
             name = req.body.name;
         if(req.body.countryCode != null)
@@ -102,7 +106,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
 
 
         // Update the warp
-        const promise = buildTeam.updateWarp(id, name, countryCode, countryCodeType, subRegion, city, worldName, lat, lon, y, yaw, pitch, isHighlight);
+        const promise = buildTeam.updateWarp(id, warpGroupID, name, countryCode, countryCodeType, subRegion, city, worldName, lat, lon, y, yaw, pitch, isHighlight);
 
 
         // Wait for the promise to resolve
