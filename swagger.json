@@ -1054,7 +1054,7 @@
         "tags": [
           "Build Teams"
         ],
-        "summary": "Create a Build Team Warp Groups",
+        "summary": "Create a Build Team Warp Group",
         "description": "Creates a new warp group for a build team of BuildTheEarth.",
         "parameters": [
           {
