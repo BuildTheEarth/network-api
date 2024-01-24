@@ -315,6 +315,11 @@ export default class Network {
         return await this.getWarpsFromDatabase();
     }
 
+    /** Returns a list of all warp groups. If no warps are found, an empty list is returned.*/
+    async getWarpGroups(){
+        return await this.getWarpGroupsFromDatabase();
+    }
+
 
 
     // Validate values
@@ -445,6 +450,11 @@ export default class Network {
 
     private async getWarpsFromDatabase(){
         const SQL = "SELECT * FROM BuildTeamWarps";
+        return await this.networkDatabase.query(SQL);
+    }
+
+    private async getWarpGroupsFromDatabase(){
+        const SQL = "SELECT * FROM BuildTeamWarpGroups";
         return await this.networkDatabase.query(SQL);
     }
 }

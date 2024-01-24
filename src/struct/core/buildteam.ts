@@ -203,10 +203,16 @@ export default class BuildTeam {
         return await this.updateHasBuildTeamToolsInstalledInDatabase(hasBuildTeamToolsInstalled);
     }
 
+
+    /* ======================================= */
+    /*                  Warps                  */
+    /* ======================================= */
+
+
     /** Creates a new warp for the build team.
      * 
      * @param id The ID of the warp
-     * @param name The key of the warp
+     * @param name The name of the warp
      * @param countryCode Country Code that matches the countryCodeType
      * @param countryCodeType Country Code Type like cca2, cca3, ccn3, or cioc
      * @param subRegion Name of the the subregion like state or province.
@@ -266,23 +272,23 @@ export default class BuildTeam {
 
     /** Updates an existing warp of the build team.
      * 
-     * @param ID The ID of the warp
-     * @param key The key of the warp
-     * @param countryCode Country Code that matches the countryCodeType
+     * @param ID The new ID of the warp
+     * @param name The new name of the warp
+     * @param countryCode The new Country Code that matches the countryCodeType
      * @param countryCodeType Country Code Type like cca2, cca3, ccn3, or cioc
-     * @param subRegion Name of the the subregion like state or province.
-     * @param city Name of the city
+     * @param subRegion The new name of the the subregion like state or province.
+     * @param city The new name of the city
      * @param worldName The name of the world the warp is in
-     * @param lat The latitude of the warp
-     * @param lon The longitude of the warp
-     * @param y The y coordinate of the warp
-     * @param yaw The yaw of the warp
-     * @param pitch The pitch of the warp
+     * @param lat The new latitude of the warp
+     * @param lon The new longitude of the warp
+     * @param y The new y coordinate of the warp
+     * @param yaw The new yaw of the warp
+     * @param pitch The new pitch of the warp
      * @param isHighlight Whether the warp is a highlight or not
      * 
      * @returns Returns true if the warp was created successfully, otherwise false.
      **/
-    async updateWarp(ID: string, key: string, countryCode: string, countryCodeType: string, subRegion: string, city: string, worldName: string, lat: number, lon: number, y: number, yaw: number, pitch: number, isHighlight: boolean) {
+    async updateWarp(ID: string, name: string, countryCode: string, countryCodeType: string, subRegion: string, city: string, worldName: string, lat: number, lon: number, y: number, yaw: number, pitch: number, isHighlight: boolean) {
         // Validate that the build team id is loaded
         if(this.buildTeamID == null)
             await this.loadBuildTeamData();
@@ -327,7 +333,7 @@ export default class BuildTeam {
                 return false;
         }
 
-        return await this.updateWarpInDatabase(ID, this.buildTeamID, key, finalCountryCode, subRegion, city, worldName, lat, lon, y, yaw, pitch, isHighlight);
+        return await this.updateWarpInDatabase(ID, this.buildTeamID, name, finalCountryCode, subRegion, city, worldName, lat, lon, y, yaw, pitch, isHighlight);
     }
 
 
@@ -361,6 +367,98 @@ export default class BuildTeam {
 
         return result.filter((warp: any) => warp.BuildTeam == this.buildTeamID);
     }
+
+
+
+    /* ======================================= */
+    /*              Warp Groups                */
+    /* ======================================= */
+
+
+
+    /** Creates a new warp group for the build team.
+     * 
+     * @param id The ID of the warp group
+     * @param name The name of the warp group
+     * @param description The description of the warp group
+     * 
+     * @returns Returns true if the warp group was created successfully, otherwise false.
+     **/
+    async createWarpGroup(id: string|null, name: string, description: string) {
+        // Generate a new uuid if the id is null
+        if(id == null)
+            id = uuidv4();        
+
+        // Validate that the build team id is loaded
+        if(this.buildTeamID == null)
+            await this.loadBuildTeamData();
+        if(this.buildTeamID == null)
+            return false;
+        
+        return await this.createWarpGroupInDatabase(id, name, description);
+    }
+
+
+    /** Updates an existing warp group of the build team.
+     *  
+     * @param id The new ID of the warp group
+     * @param name The new name of the warp group
+     * @param description The new description of the warp group
+     * 
+     * @returns Returns true if the warp was created successfully, otherwise false.
+     **/
+    async updateWarpGroup(id: string, name: string, description: string) {
+        // Validate that the build team id is loaded
+        if(this.buildTeamID == null)
+            await this.loadBuildTeamData();
+        if(this.buildTeamID == null)
+            return false;
+
+        // Check if the warp exists
+        const warps = await this.getWarps();
+        const warp = warps.find((warp: any) => warp.ID == id);
+
+        // If the warp was not found, return an error
+        if(warp == null){
+            return false;
+        }
+
+        return await this.updateWarpGroupInDatabase(id, name, description);
+    }
+
+
+    /** Deletes a warp group from the build team.
+     * 
+     * @param key The name or ID of the warp group
+     */
+    async deleteWarpGroup(key: string) {
+        // Validate that the build team id is loaded
+        if(this.buildTeamID == null)
+            await this.loadBuildTeamData();
+
+        if(this.buildTeamID == null)
+            return false;
+
+        return await this.deleteWarpGroupInDatabase(key);
+    }
+
+    /** Returns a list of warp groups based on the build team id. If no warp groups are found, an empty list is returned.*/
+    async getWarpGroups(){
+        if(this.buildTeamID == null)
+            await this.loadBuildTeamData();
+
+        if(this.buildTeamID == null)
+            return [];
+    
+        const result = await this.network.getWarpGroups();
+
+        if(result == null)
+            return [];
+
+        return result.filter((warp: any) => warp.BuildTeam == this.buildTeamID);
+    }
+
+
 
 
 
@@ -653,6 +751,17 @@ export default class BuildTeam {
             return false;
     }
 
+    private async createWarpGroupInDatabase(id: string, name: string, description: string) {
+        const SQL = "INSERT INTO BuildTeamWarpGroups (ID, BuildTeam, Name, Description) VALUES (?, ?, ?, ?)";
+
+        const result = await this.nwDatabase.query(SQL, [id, this.buildTeamID, name, description]);
+
+        if(result.affectedRows == 1)
+            return true;
+        else 
+            return false;
+    }
+
     /* =================================================== */
     /*                DATABASE PUT REQUEST                 */
     /* =================================================== */
@@ -681,6 +790,18 @@ export default class BuildTeam {
             return false;
     }
 
+    // Updates an existing warp group in the database
+    private async updateWarpGroupInDatabase(id: string, name: string, description: string) {
+        const SQL = "UPDATE BuildTeamWarpGroups SET ID = ?, BuildTeam = ?, Name = ?, Description = ? WHERE ID = ? AND BuildTeam = ?";
+
+        const result = await this.nwDatabase.query(SQL, [id, this.buildTeamID, name, description, id, this.buildTeamID]);
+
+        if(result.affectedRows == 1)
+            return true;
+        else 
+            return false;
+    }
+
     private async updateHasBuildTeamToolsInstalledInDatabase(hasBuildTeamToolsInstalled: boolean) : Promise<boolean | string> {
         const SQL = "UPDATE BuildTeams SET hasBuildTeamToolsInstalled = ? WHERE ID = ?";
 
@@ -699,6 +820,18 @@ export default class BuildTeam {
     // Deletes a warp from the database
     private async deleteWarpInDatabase(key: string) {
         const SQL = "DELETE FROM BuildTeamWarps WHERE (Name = ? OR ID = ?) AND BuildTeam = ?";
+
+        const result = await this.nwDatabase.query(SQL, [key, key, this.buildTeamID]);
+
+        if(result.affectedRows == 1)
+            return true;
+        else 
+            return false;
+    }
+
+    // Deletes a warp group from the database
+    private async deleteWarpGroupInDatabase(key: string) {
+        const SQL = "DELETE FROM BuildTeamWarpGroups WHERE (Name = ? OR ID = ?) AND BuildTeam = ?";
 
         const result = await this.nwDatabase.query(SQL, [key, key, this.buildTeamID]);
 

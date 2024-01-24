@@ -18,7 +18,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
 
         // Validate the parameters with joi
         const schema = joi.object({
-            id: joi.string(),
+            id: joi.string().optional(),
             name: joi.string().required(),
             countryCode: joi.string().required(),
             countryCodeType: joi.string().required().valid('cca2', 'cca3', 'ccn3', 'cioc'),

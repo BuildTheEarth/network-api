@@ -76,6 +76,11 @@ const network = new Network(plotsystemDatabase, networkDatabase);
   Joi,
   network
 );
+(await import("./routes/teams/GET_WarpGroups.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
 (await import("./routes/teams/GET_Team.js")).initRoutes(
   router,
   Joi,
@@ -141,6 +146,11 @@ const network = new Network(plotsystemDatabase, networkDatabase);
   Joi,
   network
 );
+(await import("./routes/teams/GET_TeamWarpGroups.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
 (await import("./routes/internal/GET_Stats.js")).initRoutes(
   router,
   Joi,
@@ -168,6 +178,11 @@ router.use(helmet());
   Joi,
   network
 );
+(await import("./routes/teams/POST_WarpGroup.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
 
 // Init PUT Routes for the API
 (await import("./routes/teams/PUT_TeamHasBuildTeamToolsInstalled.js")).initRoutes(
@@ -185,9 +200,19 @@ router.use(helmet());
   Joi,
   network
 );
+(await import("./routes/teams/PUT_WarpGroup.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
 
 // Init DELETE Routes for the API
 (await import("./routes/teams/DELETE_Warp.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
+(await import("./routes/teams/DELETE_WarpGroup.js")).initRoutes(
   router,
   Joi,
   network

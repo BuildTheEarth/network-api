@@ -1012,6 +1012,191 @@
           }
         }
       }
+    },
+
+    "/api/teams/%KEY%/warpgroups": {
+      "get": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Get Build Team Warp Groups",
+        "description": "Returns the warp groups of a build team of BuildTheEarth.",
+        "parameters": [
+          {
+            "name": "KEY",
+            "description": "The API Key, Build Team ID, Build Team Tag, or Build Team Server of the Build Team.",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+      
+    "/api/teams/%API_KEY%/warpgroups": {
+      "post": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Create a Build Team Warp Groups",
+        "description": "Creates a new warp group for a build team of BuildTheEarth.",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the warp group."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "The description of the warp group."
+                    }
+                },
+                "example": [
+                  {
+                    "id": "cf0d3acb-e3df-4cdf-9960-d5e90aadf165",
+                    "name": "My Test Warp",
+                    "description": "This is a test warp group."
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Updates a Build Team Warp Group",
+        "description": "Updates an existing warp group of a build team with new values.",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "The ID of the warp.",
+                        "required": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the warp.",
+                        "required": false
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "The description of the warp.",
+                        "required": false
+                    }
+                },
+                "example": [
+                  {
+                    "id": "cf0d3acb-e3df-4cdf-9960-d5e90aadf167",
+                    "name": "New Warp Name",
+                    "description": "This is a new description."
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Delete a Build Team Warp Group",
+        "description": "Deletes an existing warp group from a build team of BuildTheEarth.",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The ID or Name of the warp group.",
+                        "example": "My Test Warp Group"
+                    }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/teams/warpgroups": {
+      "get": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Get Warps",
+        "description": "Get a list of all warp groups in BuildTheEarth.",
+        "parameters": [],
+        "responses": {
+          "400": {
+            "description": "No warp groups found."
+          }
+        }
+      }
     }
   }
 }
