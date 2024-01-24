@@ -295,14 +295,9 @@ export default class BuildTeam {
         if(this.buildTeamID == null)
             return false;
 
-        // Check if the warp exists
-        const warps = await this.getWarps();
-        const warp = warps.find((warp: any) => warp.ID == ID);
-
         // If the warp was not found, return an error
-        if(warp == null){
+        if(!await this.warpExists(ID))
             return false;
-        }
 
 
         // Convert the country code to cca3 if needed
@@ -368,6 +363,17 @@ export default class BuildTeam {
         return result.filter((warp: any) => warp.BuildTeam == this.buildTeamID);
     }
 
+    /** Checks if a warp exists.
+     * 
+     * @param warpID The ID of the warp
+     * 
+     * @returns Returns true if the warp exists, otherwise false.
+     */
+    async warpExists(warpID: string){
+        const warps = await this.getWarps();
+        return warps.some((warp: any) => warp.ID == warpID);
+    }
+
 
 
     /* ======================================= */
@@ -414,14 +420,9 @@ export default class BuildTeam {
         if(this.buildTeamID == null)
             return false;
 
-        // Check if the warp exists
-        const warps = await this.getWarps();
-        const warp = warps.find((warp: any) => warp.ID == id);
-
         // If the warp was not found, return an error
-        if(warp == null){
+        if(!await this.warpGroupExists(id))
             return false;
-        }
 
         return await this.updateWarpGroupInDatabase(id, name, description);
     }
@@ -458,6 +459,16 @@ export default class BuildTeam {
         return result.filter((warp: any) => warp.BuildTeam == this.buildTeamID);
     }
 
+    /** Checks if a warp group exists.
+     * 
+     * @param warpGroupID The ID of the warp group
+     * 
+     * @returns Returns true if the warp group exists, otherwise false.
+     */
+    async warpGroupExists(warpGroupID: string){
+        const warpgroups = await this.getWarpGroups();
+        return warpgroups.some((warp: any) => warp.ID == warpGroupID);
+    }
 
 
 

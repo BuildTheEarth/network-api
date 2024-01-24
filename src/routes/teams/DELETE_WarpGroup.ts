@@ -33,7 +33,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         // Get the parameters from the request
         const key = req.body.key;  // The name or ID of the warp group.
 
-        const warps = await buildTeam.getWarps();
+        const warps = await buildTeam.getWarpGroups();
         if(warps.find((warp: any) => (warp.Name == key || warp.ID == key)) == null){
             res.status(400).send({success: false, error: 'Warp Group not found in this team.'});
             return;

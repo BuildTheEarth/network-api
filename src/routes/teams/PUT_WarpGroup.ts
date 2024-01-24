@@ -32,12 +32,12 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         }
 
         // Get the current warp
-        const warps = await buildTeam.getWarps();
+        const warps = await buildTeam.getWarpGroups();
         const warp = warps.find((warp: any) => warp.ID == req.body.id);
 
         // If the warp was not found, return an error
         if(warp == null){
-            res.status(400).send({success: false, error: 'Warp not found in this team.'});
+            res.status(400).send({success: false, error: 'Warp Group not found in this team.'});
             return;
         }
 
