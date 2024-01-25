@@ -5,7 +5,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
 
     app.get('/api/teams/warpgroups', async function (req, res) {
         
-        let value = await network.getWarpGroups();
+        let value = await network.getBuildTeamWarpGroups();
             
         if(value == null) {
             res.status(400).send({ error: 'Warp Groups not found' });

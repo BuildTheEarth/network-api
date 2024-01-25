@@ -1,5 +1,5 @@
 import { Router } from "express";
-import Network, { BuildTeamIdentifier } from "../../struct/core/network.js";
+import Network, { AddressType, BuildTeamIdentifier } from "../../struct/core/network.js";
 
 export async function initRoutes(app: Router, joi: any, network: Network) {
 
@@ -23,8 +23,8 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
             warpgroup: joi.string().optional(),
             countryCode: joi.string().required(),
             countryCodeType: joi.string().required().valid('cca2', 'cca3', 'ccn3', 'cioc'),
-            subRegion: joi.string().required(),
-            city: joi.string().required(),
+            address: joi.string().optional(),
+            addressType: joi.string().optional(),
 
             worldName: joi.string().required(),
             lat: joi.number().required(),
@@ -46,26 +46,25 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
 
 
         // Get the parameters from the request
-        const id = req.body.id;                             // The id of the warp.
-        const warpGroupID = req.body.warpGroupID            // The id of the warp group.
-        const name = req.body.name;                         // The name of the warp.
-        const countryCode = req.body.countryCode;           // Country Code that matches the countryCodeType.
-        const countryCodeType = req.body.countryCodeType;   // Country Code Type like cca2, cca3, ccn3, or cioc.
-        const subRegion = req.body.subRegion;               // Name of the the subregion like state or province.
-        const city = req.body.city;                         // Name of the city.
+        const id = req.body.id;                                                                 // The id of the warp.
+        const warpGroupID = req.body.warpGroupID                                                // The id of the warp group.
+        const name = req.body.name;                                                             // The name of the warp.
+        const countryCode = req.body.countryCode;                                               // Country Code that matches the countryCodeType.
+        const countryCodeType = req.body.countryCodeType;                                       // Country Code Type like cca2, cca3, ccn3, or cioc.
+        const address = req.body.address;                                                       // The address of the warp.
+        const addressType: AddressType = convertStringToEnum(req.body.addressType);          // The type of address. (STREET, CITY, STATE, COUNTRY)
 
-        const worldName = req.body.worldName;               // The name of the world the warp is in.
-        const lat = req.body.lat;                           // The latitude of the warp.
-        const lon = req.body.lon;                           // The longitude of the warp.
-        const y = req.body.y;                               // The y coordinate of the warp.
-        const yaw = req.body.yaw;                           // The yaw of the warp.
-        const pitch = req.body.pitch;                       // The pitch of the warp.
+        const worldName = req.body.worldName;                                                   // The name of the world the warp is in.
+        const lat = req.body.lat;                                                               // The latitude of the warp.
+        const lon = req.body.lon;                                                               // The longitude of the warp.
+        const y = req.body.y;                                                                   // The y coordinate of the warp.
+        const yaw = req.body.yaw;                                                               // The yaw of the warp.
+        const pitch = req.body.pitch;                                                           // The pitch of the warp.
 
-        const isHighlight = req.body.isHighlight;           // Whether the warp is a highlight or not.
-
+        const isHighlight = req.body.isHighlight;                                               // Whether the warp is a highlight or not.
 
         // Create a new warp
-        const promise = buildTeam.createWarp(id, warpGroupID, name, countryCode, countryCodeType, subRegion, city, worldName, lat, lon, y, yaw, pitch, isHighlight);
+        const promise = buildTeam.createWarp(id, warpGroupID, name, countryCode, countryCodeType, address, addressType, worldName, lat, lon, y, yaw, pitch, isHighlight);
 
 
         // Wait for the promise to resolve
@@ -81,4 +80,11 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
             res.send({success: true})
         })       
     })
+
+    function convertStringToEnum(input: string): AddressType {
+        if (input in AddressType) {
+            return AddressType[input as keyof typeof AddressType];
+        }
+        return AddressType.CITY;
+    }
 }

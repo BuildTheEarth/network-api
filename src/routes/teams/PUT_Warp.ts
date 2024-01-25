@@ -24,8 +24,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
             name: joi.string().optional(),
             countryCode: joi.string().optional(),
             countryCodeType: joi.string().optional().valid('cca2', 'cca3', 'ccn3', 'cioc'),
-            subRegion: joi.string().optional(),
-            city: joi.string().optional(),
+            address: joi.string().optional(),
 
             worldName: joi.string().optional(),
             lat: joi.number().optional(),
@@ -61,8 +60,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         let name = warp.Name;                   // The name of the warp.
         let countryCode = warp.CountryCode;     // Country Code that matches the countryCodeType.
         let countryCodeType = "cca3";           // Country Code Type like cca2, cca3, ccn3, or cioc.
-        let subRegion = warp.SubRegion;         // Name of the the subregion like state or province.
-        let city = warp.City;                   // Name of the city.
+        let address = warp.Address;             // The address of the warp.
 
         let worldName = warp.WorldName;         // The name of the world the warp is in.
         let lat = warp.Latitude;                // The latitude of the warp.
@@ -85,10 +83,8 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
             countryCode = req.body.countryCode;
         if(req.body.countryCodeType != null)
             countryCodeType = req.body.countryCodeType;
-        if(req.body.subRegion != null)
-            subRegion = req.body.subRegion;
-        if(req.body.city != null)
-            city = req.body.city;
+        if(req.body.address != null)
+            address = req.body.address;
         if(req.body.worldName != null)
             worldName = req.body.worldName;
         if(req.body.lat != null)
@@ -106,7 +102,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
 
 
         // Update the warp
-        const promise = buildTeam.updateWarp(id, warpGroupID, name, countryCode, countryCodeType, subRegion, city, worldName, lat, lon, y, yaw, pitch, isHighlight);
+        const promise = buildTeam.updateWarp(id, warpGroupID, name, countryCode, countryCodeType, address, worldName, lat, lon, y, yaw, pitch, isHighlight);
 
 
         // Wait for the promise to resolve

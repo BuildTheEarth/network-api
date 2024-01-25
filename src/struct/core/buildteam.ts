@@ -1,5 +1,5 @@
 import DatabaseHandler from "../database.js";
-import Network from "./network.js";
+import Network, { AddressType } from "./network.js";
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs/promises';
 import path from 'path';
@@ -251,8 +251,7 @@ export default class BuildTeam {
      * @param name The name of the warp
      * @param countryCode Country Code that matches the countryCodeType
      * @param countryCodeType Country Code Type like cca2, cca3, ccn3, or cioc
-     * @param subRegion Name of the the subregion like state or province.
-     * @param city Name of the city
+     * @param address The address of the warp
      * @param worldName The name of the world the warp is in
      * @param lat The latitude of the warp
      * @param lon The longitude of the warp
@@ -263,10 +262,18 @@ export default class BuildTeam {
      * 
      * @returns Returns true if the warp was created successfully, otherwise false.
      **/
-    async createWarp(id: string|null, warpGroupID: string, name: string, countryCode: string, countryCodeType: string, subRegion: string, city: string, worldName: string, lat: number, lon: number, y: number, yaw: number, pitch: number, isHighlight: boolean) {
+    async createWarp(id: string|null, warpGroupID: string|null, name: string, countryCode: string, countryCodeType: string, address: string|null, addressType: AddressType, worldName: string, lat: number, lon: number, y: number, yaw: number, pitch: number, isHighlight: boolean) {
         // Generate a new uuid if the id is null
-        if(id == null)
+        if(id == null || id == undefined)
             id = uuidv4();        
+
+        // Get the address of the warp if it is null
+        if(address == null || address == undefined)
+            address = await this.network.getAddressFromCoordinates(lat, lon, addressType);
+
+        // If warpGroupID is undefined, set it to null
+        if(warpGroupID == undefined)
+            warpGroupID = null;
 
         // Validate that the build team id is loaded
         if(this.buildTeamID == null)
@@ -302,7 +309,7 @@ export default class BuildTeam {
                 return false;
         }
         
-        return await this.createWarpInDatabase(id, this.buildTeamID, warpGroupID, name, finalCountryCode, subRegion, city, worldName, lat, lon, y, yaw, pitch, isHighlight);
+        return await this.createWarpInDatabase(id, this.buildTeamID, warpGroupID, name, finalCountryCode, address, worldName, lat, lon, y, yaw, pitch, isHighlight);
     }
 
 
@@ -313,8 +320,7 @@ export default class BuildTeam {
      * @param name The new name of the warp
      * @param countryCode The new Country Code that matches the countryCodeType
      * @param countryCodeType Country Code Type like cca2, cca3, ccn3, or cioc
-     * @param subRegion The new name of the the subregion like state or province.
-     * @param city The new name of the city
+     * @param address The new address of the warp
      * @param worldName The name of the world the warp is in
      * @param lat The new latitude of the warp
      * @param lon The new longitude of the warp
@@ -325,7 +331,7 @@ export default class BuildTeam {
      * 
      * @returns Returns true if the warp was created successfully, otherwise false.
      **/
-    async updateWarp(ID: string, warpGroupID: string, name: string, countryCode: string, countryCodeType: string, subRegion: string, city: string, worldName: string, lat: number, lon: number, y: number, yaw: number, pitch: number, isHighlight: boolean) {
+    async updateWarp(ID: string, warpGroupID: string, name: string, countryCode: string, countryCodeType: string, address: string, worldName: string, lat: number, lon: number, y: number, yaw: number, pitch: number, isHighlight: boolean) {
         // Validate that the build team id is loaded
         if(this.buildTeamID == null)
             await this.loadBuildTeamData();
@@ -365,7 +371,7 @@ export default class BuildTeam {
                 return false;
         }
 
-        return await this.updateWarpInDatabase(ID, this.buildTeamID, warpGroupID, name, finalCountryCode, subRegion, city, worldName, lat, lon, y, yaw, pitch, isHighlight);
+        return await this.updateWarpInDatabase(ID, this.buildTeamID, warpGroupID, name, finalCountryCode, address, worldName, lat, lon, y, yaw, pitch, isHighlight);
     }
 
 
@@ -392,7 +398,7 @@ export default class BuildTeam {
         if(this.buildTeamID == null)
             return [];
     
-        const result = await this.network.getWarps();
+        const result = await this.network.getBuildTeamWarps();
 
         if(result == null)
             return [];
@@ -488,7 +494,7 @@ export default class BuildTeam {
         if(this.buildTeamID == null)
             return [];
     
-        const result = await this.network.getWarpGroups();
+        const result = await this.network.getBuildTeamWarpGroups();
 
         if(result == null)
             return [];
@@ -788,10 +794,10 @@ export default class BuildTeam {
             return false;
     }   
 
-    private async createWarpInDatabase(ID: string, buildTeamID: string, warpGroupID: string, name: string, countryCode: string, subRegion: string, city: string, worldName: string, lat: number, lon: number, height: number, yaw: number, pitch: number, isHighlight: boolean) {
-        const SQL = "INSERT INTO BuildTeamWarps (ID, BuildTeam, WarpGroup, Name, CountryCode, SubRegion, City, WorldName, Latitude, Longitude, Height, Yaw, Pitch, IsHighlight) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private async createWarpInDatabase(ID: string, buildTeamID: string, warpGroupID: string|null, name: string, countryCode: string, address: string, worldName: string, lat: number, lon: number, height: number, yaw: number, pitch: number, isHighlight: boolean) {
+        const SQL = "INSERT INTO BuildTeamWarps (ID, BuildTeam, WarpGroup, Name, CountryCode, Address, WorldName, Latitude, Longitude, Height, Yaw, Pitch, IsHighlight) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        const result = await this.nwDatabase.query(SQL, [ID, buildTeamID, warpGroupID, name, countryCode, subRegion, city, worldName, lat, lon, height, yaw, pitch, isHighlight]);
+        const result = await this.nwDatabase.query(SQL, [ID, buildTeamID, warpGroupID, name, countryCode, address, worldName, lat, lon, height, yaw, pitch, isHighlight]);
 
         if(result.affectedRows == 1)
             return true;
@@ -827,10 +833,10 @@ export default class BuildTeam {
     }
 
     // Updates an existing warp in the database
-    private async updateWarpInDatabase(ID: string, buildTeamID: string, warpGroupID: string, name: string, countryCode: string, subRegion: string, city: string, worldName: string, lat: number, lon: number, height: number, yaw: number, pitch: number, isHighlight: boolean) {
-        const SQL = "UPDATE BuildTeamWarps SET ID = ?, BuildTeam = ?, WarpGroup = ?, Name = ?, CountryCode = ?, SubRegion = ?, City = ?, WorldName = ?, Latitude = ?, Longitude = ?, Height = ?, Yaw = ?, Pitch = ?, IsHighlight = ? WHERE ID = ? AND BuildTeam = ?";
+    private async updateWarpInDatabase(ID: string, buildTeamID: string, warpGroupID: string, name: string, countryCode: string, address: string, worldName: string, lat: number, lon: number, height: number, yaw: number, pitch: number, isHighlight: boolean) {
+        const SQL = "UPDATE BuildTeamWarps SET ID = ?, BuildTeam = ?, WarpGroup = ?, Name = ?, CountryCode = ?, Address = ?, WorldName = ?, Latitude = ?, Longitude = ?, Height = ?, Yaw = ?, Pitch = ?, IsHighlight = ? WHERE ID = ? AND BuildTeam = ?";
 
-        const result = await this.nwDatabase.query(SQL, [ID, buildTeamID, warpGroupID, name, countryCode, subRegion, city, worldName, lat, lon, height, yaw, pitch, isHighlight, ID, buildTeamID]);
+        const result = await this.nwDatabase.query(SQL, [ID, buildTeamID, warpGroupID, name, countryCode, address, worldName, lat, lon, height, yaw, pitch, isHighlight, ID, buildTeamID]);
 
         if(result.affectedRows == 1)
             return true;

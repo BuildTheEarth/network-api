@@ -14,6 +14,13 @@ export enum BuildTeamIdentifier {
     Server = "Server"
 }
 
+export enum AddressType {
+    STREET = "17",
+    CITY = "10",
+    STATE = "5",
+    COUNTRY = "3",
+}
+
 export default class Network {
     private static readonly API_KEY_UPDATE_INTERVAL: number = 10; // 10 minutes
 
@@ -353,18 +360,44 @@ export default class Network {
         return buildTeamRegionsCopy;
     }
 
+    async getBuildTeamWarps(){
+        if(this.buildTeamWarps == null)
+            await this.loadBuildTeamWarps();
 
+        if(this.buildTeamWarps == null)
+            return null;
 
-
-    /** Returns a list of all warps. If no warps are found, an empty list is returned.*/
-    async getWarps(){
-        return await this.getWarpsFromDatabase();
+        return this.buildTeamWarps;
     }
 
-    /** Returns a list of all warp groups. If no warps are found, an empty list is returned.*/
-    async getWarpGroups(){
-        return await this.getWarpGroupsFromDatabase();
+    async getBuildTeamWarpGroups(){
+        if(this.buildTeamWarpGroups == null)
+            await this.loadBuildTeamWarpGroups();
+
+        if(this.buildTeamWarpGroups == null)
+            return null;
+
+        return this.buildTeamWarpGroups;
     }
+
+    async getAddressFromCoordinates(lat: number, lon: number, addressType: AddressType): Promise<string>{
+        // Convert the addressType to a zoom level
+        let zoomLevel = addressType.valueOf();
+
+        // Get the address from the OpenStreetMap API
+        const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=${zoomLevel}`;
+
+        const response = await fetch(url);
+        const json = await response.json();
+
+        // Return the address
+        return json.display_name;
+    }
+
+
+
+
+    
 
 
 

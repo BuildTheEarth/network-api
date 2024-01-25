@@ -738,13 +738,15 @@
                         "description": "Country Code Type like cca2, cca3, ccn3, or cioc",
                         "enum": ["cca2", "cca3", "ccn3", "cioc"]
                     },
-                    "subRegion": {
+                    "address": {
                         "type": "string",
-                        "description": "Name of the the subregion like state or province."
+                        "description": "The address of the warp.",
+                        "required": false
                     },
-                    "city": {
-                        "type": "string",
-                        "description": "Name of the city."
+                    "addressType": {
+                      "type": "string",
+                      "description": "The address type of the warp. Available types: STREET, CITY, STATE, COUNTRY",
+                      "required": false
                     },
                     "worldName": {
                         "type": "string",
@@ -782,8 +784,6 @@
                     "name": "My Test Warp",
                     "countryCode": "276",
                     "countryCodeType": "ccn3",
-                    "subRegion": "Hesse",
-                    "city": "Frankfurt am Main",
                     "worldName": "world",
                     "lat": 50.113481708923736,
                     "lon": 8.679198129877463,
@@ -853,17 +853,11 @@
                         "required": false,
                         "example": "ccn3"
                     },
-                    "subRegion": {
+                    "address": {
                         "type": "string",
-                        "description": "Name of the the subregion like state or province.",
+                        "description": "The address of the warp.",
                         "required": false,
-                        "example": "Hesse"
-                    },
-                    "city": {
-                        "type": "string",
-                        "description": "Name of the city.",
-                        "required": false,
-                        "example": "Frankfurt am Main"
+                        "example": "Frankfurt am Main, 60437, Hesse, Germany"
                     },
                     "worldName": {
                         "type": "string",
@@ -990,24 +984,6 @@
           {
             "name": "country",
             "description": "Filter the warps by country code.",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            },
-            "required": false
-          },
-          {
-            "name": "subRegion",
-            "description": "Filter the warps by subregion.",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            },
-            "required": false
-          },
-          {
-            "name": "city",
-            "description": "Filter the warps by city.",
             "in": "query",
             "schema": {
               "type": "string"
