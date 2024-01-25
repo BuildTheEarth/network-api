@@ -17,7 +17,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         }
 
         // Validate that the Build Team is the test Build Team
-        if(buildTeam.getBuildTeamID() != "qtS6b2an"){
+        if(await buildTeam.getBuildTeamID() != "qtS6b2an"){
             res.status(400).send({ error: 'Please provide a valid API key' });
             return;
         }

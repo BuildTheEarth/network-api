@@ -117,6 +117,8 @@ export default class Network {
 
         this.updateCacheTicks = 0;
 
+        await this.updateCache();
+
         return true;
     }
 

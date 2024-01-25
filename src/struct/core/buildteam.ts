@@ -52,9 +52,9 @@ export default class BuildTeam {
         this.nwDatabase = network.getNetworkDatabase();
     }
 
-    getBuildTeamID(){
+    async getBuildTeamID(){
         if(this.buildTeamID == null)
-            this.loadBuildTeamData();
+            await this.loadBuildTeamData();
 
         return this.buildTeamID;
     }
