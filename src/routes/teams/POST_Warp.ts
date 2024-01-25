@@ -20,7 +20,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         const schema = joi.object({
             id: joi.string().optional(),
             name: joi.string().required(),
-            warpgroup: joi.string().optional(),
+            warpGroupID: joi.string().optional(),
             countryCode: joi.string().required(),
             countryCodeType: joi.string().required().valid('cca2', 'cca3', 'ccn3', 'cioc'),
             address: joi.string().optional(),
