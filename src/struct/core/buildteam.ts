@@ -136,6 +136,8 @@ export default class BuildTeam {
         if(this.network.buildTeamServers == null)
             await this.network.loadBuildTeamServers();
         
+        if(this.network.buildTeamInfo == null || this.network.buildTeamRegions == null || this.network.buildTeamServers == null)
+            return null;
 
         // BuildTeamInfo is a json array with one object per buildteam
         const info = this.network.buildTeamInfo.filter((info: any) => info.APIKey == this.apiKey)[0];

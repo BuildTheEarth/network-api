@@ -7,7 +7,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
     app.delete('/api/plotsystem/teams/:apikey/plots', async function (req, res) {
 
         // Validate that the API key is a valid GUID
-        if(!network.validateAPIKey(req, res))
+        if(!await network.validateAPIKey(req, res))
             return;
 
 

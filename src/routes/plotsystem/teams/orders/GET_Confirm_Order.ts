@@ -5,7 +5,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
     app.get('/api/plotsystem/teams/:apikey/orders/:orderId/confirm', async function (req, res) {
 
         // Validate that the API key is a valid GUID
-        if(!network.validateAPIKeyAndOrderID(req, res))
+        if(!await network.validateAPIKeyAndOrderID(req, res))
             return;
 
         const buildTeam = await network.getBuildTeam(req.params.apikey, BuildTeamIdentifier.APIKey);
@@ -32,5 +32,4 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         // Return the success message to the client including the plotID
         res.send({success: true, plot_id: result.toString()})
     })
-
 }

@@ -5,7 +5,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
     app.get('/api/internal/:apikey/resetCache', async function (req, res) {
 
         // Validate that the API key is a valid GUID of the test Build Team
-        if(!network.validateAPIKey(req, res))
+        if(!await network.validateAPIKey(req, res))
             return;
 
         // Get the Build Team

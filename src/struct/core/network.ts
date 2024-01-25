@@ -106,6 +106,7 @@ export default class Network {
         this.buildTeams.clear();
         this.plotSystem.resetCache();
 
+        this.apiKeys = null;
         this.apiKeyBuildTeamIDMap.clear();
         this.apiKeyBuildTeamTagMap.clear();
         this.apiKeyBuildTeamServerMap.clear();
@@ -170,9 +171,9 @@ export default class Network {
     }
 
 
-    getAPIKeys(): string[] {
+    async getAPIKeys(): Promise<string[]> {
         if (this.apiKeys == null) {
-            this.updateCache();
+            await this.updateCache();
             return [];
         }
 
@@ -204,7 +205,7 @@ export default class Network {
     }
 
     async getBuildTeam(key: string, identifier: BuildTeamIdentifier): Promise<BuildTeam|null|undefined> {
-        const api_keys = this.getAPIKeys();
+        const api_keys = await this.getAPIKeys();
 
         let apiKey = null;
 
@@ -342,7 +343,7 @@ export default class Network {
     // Validate values
 
     // Validate an API key that looks like this "fffb262b-0324-499a-94a6-eebf845e6123"
-    validateAPIKey(req: express.Request, res: express.Response): boolean {
+    async validateAPIKey(req: express.Request, res: express.Response): Promise<boolean> {
         // Validate that the API key is a valid GUID
         const schema = joi.object().keys({
             apikey: joi.string().guid().required(),
@@ -355,7 +356,7 @@ export default class Network {
         }
 
         //Validate that the API key exists in the plot system database
-        const api_keys = this.getAPIKeys();
+        const api_keys = await this.getAPIKeys();
 
         if (!api_keys.includes(req.params.apikey)) {
             res.status(401).send({ success: false, error: "Invalid API key" });
@@ -366,7 +367,7 @@ export default class Network {
     }
 
      // Validate an API key and an Order ID that look like this "fffb262b-0324-499a-94a6-eebf845e6123"
-     validateAPIKeyAndOrderID(req: express.Request, res: express.Response): boolean {
+     async validateAPIKeyAndOrderID(req: express.Request, res: express.Response): Promise<boolean> {
         // Validate that the API key and the oOder ID is a valid GUID
         const schema = joi.object().keys({
             apikey: joi.string().guid().required(),
@@ -380,7 +381,7 @@ export default class Network {
         }
 
         //Validate that the API key exists in the plot system database
-        const api_keys = this.getAPIKeys();
+        const api_keys = await this.getAPIKeys();
 
         if (!api_keys.includes(req.params.apikey)) {
             res.status(401).send({ success: false, error: "Invalid API key" });
@@ -392,7 +393,7 @@ export default class Network {
 
     // Validate a key that is either an API Key or a Build Team ID or a Build Team Tag or a BuildTeam Server ID
     async validateKey(req: express.Request, res: express.Response): Promise<BuildTeamIdentifier|null> {
-        const apiKeys = this.getAPIKeys();
+        const apiKeys = await this.getAPIKeys();
 
         // Check if key is an API Key
         if(apiKeys.includes(req.params.key))
