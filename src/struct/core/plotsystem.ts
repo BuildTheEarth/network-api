@@ -27,6 +27,11 @@ export default class PlotSystem {
         this.difficulties = await this.getDifficultiesFromDatabase();
   }
 
+  async resetCache() {
+    this.builders = null;
+    this.difficulties = null;
+  }
+
 
 
   getPSBuilders() {

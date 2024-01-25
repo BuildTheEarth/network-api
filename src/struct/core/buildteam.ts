@@ -59,8 +59,8 @@ export default class BuildTeam {
         return this.buildTeamID;
     }
 
-    // Empties the cache for the build team
-    async emptyCache(){
+    // Updates the cache for the build team
+    async updateCache(){
         if(this.psDatabase.settings.debug)
             console.log("Emptying the cache for build team: " + this.apiKey)
 
@@ -78,6 +78,15 @@ export default class BuildTeam {
 
         if(this.psFTPConfiguration != null && this.network.getUpdateCacheTicks() % BuildTeam.FTP_CONFIGURATION_UPDATE_INTERVAL == 0)
             this.psFTPConfiguration.clear();
+    }
+
+    // Resets the cache for the build team
+    async resetCache(){
+        this.buildTeamInfo = null;
+        this.psCities.clear();
+        this.psCountries.clear();
+        this.psServers.clear();
+        this.psFTPConfiguration.clear();
     }
 
     async loadBuildTeamData(){

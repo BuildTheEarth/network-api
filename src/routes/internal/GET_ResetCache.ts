@@ -2,7 +2,7 @@ import { Router } from "express";
 import Network, { BuildTeamIdentifier } from "../../struct/core/network.js";
 
 export async function initRoutes(app: Router, joi: any, network: Network) {
-    app.get('/api/internal/:apikey/stats', async function (req, res) {
+    app.get('/api/internal/:apikey/resetCache', async function (req, res) {
 
         // Validate that the API key is a valid GUID of the test Build Team
         if(!network.validateAPIKey(req, res))
@@ -22,16 +22,16 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
             return;
         }
 
-        const stats = await network.getStats();
+        const success = await network.resetCache();
 
-        if(stats == null) {
-            res.status(400).send({ error: 'Stats could not get loaded' });
+        if(!success) {
+            res.status(400).send({ error: 'Cache could not be resetted.' });
             return;
         }
         
         
         res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify(stats))
+        res.send({success: true})
     })
 
 }

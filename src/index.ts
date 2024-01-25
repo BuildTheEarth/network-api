@@ -156,6 +156,11 @@ const network = new Network(plotsystemDatabase, networkDatabase);
   Joi,
   network
 );
+(await import("./routes/internal/GET_ResetCache.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
 
 
 // Use the body-parser middleware

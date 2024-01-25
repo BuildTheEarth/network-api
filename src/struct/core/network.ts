@@ -91,7 +91,7 @@ export default class Network {
 
             if (buildTeam == null) continue;
 
-            await buildTeam.emptyCache();
+            await buildTeam.updateCache();
 
             if (isStarting == true) bar?.tick();
         }
@@ -100,6 +100,23 @@ export default class Network {
 
         if(this.updateCacheTicks >= Number.MAX_SAFE_INTEGER - 100)
             this.updateCacheTicks = 0;
+    }
+
+    async resetCache() {
+        this.buildTeams.clear();
+        this.plotSystem.resetCache();
+
+        this.apiKeyBuildTeamIDMap.clear();
+        this.apiKeyBuildTeamTagMap.clear();
+        this.apiKeyBuildTeamServerMap.clear();
+
+        this.buildTeamInfo = null;
+        this.buildTeamRegions = null;
+        this.buildTeamServers = null;
+
+        this.updateCacheTicks = 0;
+
+        return true;
     }
 
  
