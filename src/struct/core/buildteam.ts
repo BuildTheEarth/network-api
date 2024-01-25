@@ -135,6 +135,10 @@ export default class BuildTeam {
             await this.network.loadBuildTeamRegions();
         if(this.network.buildTeamServers == null)
             await this.network.loadBuildTeamServers();
+        if(this.network.buildTeamWarps == null)
+            await this.network.loadBuildTeamWarps();
+        if(this.network.buildTeamWarpGroups == null)
+            await this.network.loadBuildTeamWarpGroups();
         
         if(this.network.buildTeamInfo == null || this.network.buildTeamRegions == null || this.network.buildTeamServers == null)
             return null;
@@ -164,21 +168,41 @@ export default class BuildTeam {
             info.isConnectedToNetwork = true;
         }
 
+        // Add servers to the build team info
+
         if(servers == null)
             info.Servers = this.network.buildTeamServers.filter((server: any) => server.BuildTeam == info.ID);
         else
             info.Servers = servers;
 
-        // Remove BuildTeam from each server in the Servers array
         for(const server of info.Servers)
             server.BuildTeam = undefined;
 
+        // Add regions to the build team info
+
         info.Regions = this.network.buildTeamRegions.filter((region: any) => region.BuildTeam == info.ID);
 
-        // Remove BuildTeam from each region in the Regions array
         for(const region of info.Regions)
             region.BuildTeam = undefined;
 
+
+        // Add warps to the build team info
+
+        info.Warps = this.network.buildTeamWarps.filter((warp: any) => warp.BuildTeam == info.ID);
+
+        for(const warp of this.network.buildTeamWarps)
+            warp.BuildTeam = undefined;
+
+
+        // Add warp groups to the build team info
+
+        info.WarpGroups = this.network.buildTeamWarpGroups.filter((warpGroup: any) => warpGroup.BuildTeam == info.ID);
+
+        for(const warpGroup of this.network.buildTeamWarpGroups)
+            warpGroup.BuildTeam = undefined;
+        
+        
+        // Set the build team info
         this.buildTeamInfo = info;
 
         return info;

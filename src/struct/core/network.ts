@@ -20,6 +20,8 @@ export default class Network {
     private static readonly BUILD_TEAM_INFO_UPDATE_INTERVAL: number = 60 * 1; // 1 hour
     private static readonly BUILD_TEAM_REGIONS_UPDATE_INTERVAL: number = 60 * 1; // 1 hour
     private static readonly BUILD_TEAM_SERVERS_UPDATE_INTERVAL: number = 60 * 1; // 1 hour
+    private static readonly BUILD_TEAM_WARPS_UPDATE_INTERVAL: number = 60 * 1; // 1 hour
+    private static readonly BUILD_TEAM_WARP_GROUPS_UPDATE_INTERVAL: number = 60 * 1; // 1 hour
 
     private plotsystemDatabase: DatabaseHandler;
     private networkDatabase: DatabaseHandler;
@@ -35,6 +37,8 @@ export default class Network {
     public buildTeamInfo: any | null = null;
     public buildTeamRegions: any | null = null;
     public buildTeamServers: any | null = null;
+    public buildTeamWarps: any | null = null;
+    public buildTeamWarpGroups: any | null = null;
 
     private updateCacheTicks: number = 0;
 
@@ -83,6 +87,12 @@ export default class Network {
         if(this.buildTeamServers != null && this.getUpdateCacheTicks() % Network.BUILD_TEAM_SERVERS_UPDATE_INTERVAL == 0)
             this.buildTeamServers = null;
             
+        if(this.buildTeamWarps != null && this.getUpdateCacheTicks() % Network.BUILD_TEAM_WARPS_UPDATE_INTERVAL == 0)
+            this.buildTeamWarps = null;
+
+        if(this.buildTeamWarpGroups != null && this.getUpdateCacheTicks() % Network.BUILD_TEAM_WARP_GROUPS_UPDATE_INTERVAL == 0)
+            this.buildTeamWarpGroups = null;
+
 
         this.plotSystem.updateCache();
 
@@ -114,6 +124,8 @@ export default class Network {
         this.buildTeamInfo = null;
         this.buildTeamRegions = null;
         this.buildTeamServers = null;
+        this.buildTeamWarps = null;
+        this.buildTeamWarpGroups = null;
 
         this.updateCacheTicks = 0;
 
@@ -255,6 +267,20 @@ export default class Network {
             return;
 
         this.buildTeamServers = await this.getBuildTeamServersFromDatabase();
+    }
+
+    async loadBuildTeamWarps() {
+        if(this.buildTeamWarps != null)
+            return;
+
+        this.buildTeamWarps = await this.getWarpsFromDatabase();
+    }
+
+    async loadBuildTeamWarpGroups() {
+        if(this.buildTeamWarpGroups != null)
+            return;
+
+        this.buildTeamWarpGroups = await this.getWarpGroupsFromDatabase();
     }
 
 
