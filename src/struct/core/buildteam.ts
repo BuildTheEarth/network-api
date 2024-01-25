@@ -140,7 +140,11 @@ export default class BuildTeam {
         if(this.network.buildTeamWarpGroups == null)
             await this.network.loadBuildTeamWarpGroups();
         
-        if(this.network.buildTeamInfo == null || this.network.buildTeamRegions == null || this.network.buildTeamServers == null)
+        if(this.network.buildTeamInfo == null 
+        || this.network.buildTeamRegions == null 
+        || this.network.buildTeamServers == null 
+        || this.network.buildTeamWarps == null 
+        || this.network.buildTeamWarpGroups == null)
             return null;
 
         // BuildTeamInfo is a json array with one object per buildteam
@@ -278,8 +282,10 @@ export default class BuildTeam {
         // Validate that the build team id is loaded
         if(this.buildTeamID == null)
             await this.loadBuildTeamData();
-        if(this.buildTeamID == null)
+        if(this.buildTeamID == null){
+            console.log("Build Team ID could not be loaded in createWarp().")
             return false;
+        }
 
         // Convert the country code to cca3 if needed
         let finalCountryCode: string = countryCode;

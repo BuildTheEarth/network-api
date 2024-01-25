@@ -12,12 +12,19 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
 
         const buildTeam = await network.getBuildTeam(req.params.key, type);
 
-        if(buildTeam == null) {
+        if(buildTeam == null || buildTeam == undefined) {
             res.status(400).send({ error: 'Build Team not found' });
+            return;
+        }
+
+        const info = await buildTeam.getBuildTeamInfo(null);
+
+        if(info == null || info == undefined) {
+            res.status(400).send({ error: 'Build Team Info not found' });
             return;
         }
         
         res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify(await buildTeam.getBuildTeamInfo(null)))
+        res.send(JSON.stringify(info))
     })
 }
