@@ -139,19 +139,37 @@ export default class BuildTeam {
             await this.network.loadBuildTeamWarps();
         if(this.network.buildTeamWarpGroups == null)
             await this.network.loadBuildTeamWarpGroups();
-        
-        if(this.network.buildTeamInfo == null 
-        || this.network.buildTeamRegions == null 
-        || this.network.buildTeamServers == null 
-        || this.network.buildTeamWarps == null 
-        || this.network.buildTeamWarpGroups == null)
+
+        // Validate that all data is loaded
+        if(this.network.buildTeamInfo == null){
+            console.log("Build Team Info could not be loaded in loadBuildTeamInfo().")
             return null;
+        }
+        if(this.network.buildTeamRegions == null){
+            console.log("Build Team Regions could not be loaded in loadBuildTeamInfo().")
+            return null;
+        }
+        if(this.network.buildTeamServers == null){
+            console.log("Build Team Servers could not be loaded in loadBuildTeamInfo().")
+            return null;
+        }
+        if(this.network.buildTeamWarps == null){
+            console.log("Build Team Warps could not be loaded in loadBuildTeamInfo().")
+            return null;
+        }
+        if(this.network.buildTeamWarpGroups == null){
+            console.log("Build Team Warp Groups could not be loaded in loadBuildTeamInfo().")
+            return null;
+        }
+
 
         // BuildTeamInfo is a json array with one object per buildteam
         const info = this.network.buildTeamInfo.filter((info: any) => info.APIKey == this.apiKey)[0];
 
-        if(info == null)
+        if(info == null){
+            console.log("Build Team Info could not be found by API Key in loadBuildTeamInfo().")
             return null;
+        }
 
         // Remove the APIKey from the object
         info.APIKey = undefined;
@@ -219,14 +237,18 @@ export default class BuildTeam {
         if(this.buildTeamInfo == null)
             await this.loadBuildTeamInfo();
 
-        if(this.buildTeamInfo == null)
+        if(this.buildTeamInfo == null){
+            console.log("Build Team Info could not be loaded in getBuildTeamInfo().")
             return null;
+        }
             
         if(key == null)
             return this.buildTeamInfo;
 
-        if(!this.buildTeamInfo.hasOwnProperty(key))
+        if(!this.buildTeamInfo.hasOwnProperty(key)){
+            console.log("Build Team Info key could not be found in getBuildTeamInfo(). Key: " + key)
             return null;
+        }
 
         return this.buildTeamInfo[key];
     }
