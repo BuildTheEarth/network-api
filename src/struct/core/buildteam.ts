@@ -174,7 +174,7 @@ export default class BuildTeam {
         info = JSON.parse(JSON.stringify(info));
 
         if(info == null){
-            console.log("Build Team Info could not be found by API Key in loadBuildTeamInfo(). API Key: " + this.apiKey + " | API Keys in BuildTeamInfo: " + this.network.buildTeamInfo.map((info: any) => info.APIKey).join(", "))     
+            console.log("Build Team Info could not be found by API Key in loadBuildTeamInfo().")     
             return null;
         }
 
