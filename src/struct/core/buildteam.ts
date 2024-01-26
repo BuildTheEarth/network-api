@@ -168,7 +168,10 @@ export default class BuildTeam {
 
 
         // BuildTeamInfo is a json array with one object per buildteam
-        const info = this.network.buildTeamInfo.filter((info: any) => info.APIKey == this.apiKey)[0];
+        let info = this.network.buildTeamInfo.filter((info: any) => info.APIKey == this.apiKey)[0];
+
+        // Make a copy of the object
+        info = JSON.parse(JSON.stringify(info));
 
         if(info == null){
             console.log("Build Team Info could not be found by API Key in loadBuildTeamInfo(). API Key: " + this.apiKey + " | API Keys in BuildTeamInfo: " + this.network.buildTeamInfo.map((info: any) => info.APIKey).join(", "))     
