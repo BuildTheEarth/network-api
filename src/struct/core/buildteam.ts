@@ -200,7 +200,7 @@ export default class BuildTeam {
         // Add servers to the build team info
 
         if(servers == null)
-            info.Servers = this.network.buildTeamServers.filter((server: any) => server.BuildTeam == info.ID);
+            info.Servers = JSON.parse(JSON.stringify(this.network.buildTeamServers)).filter((server: any) => server.BuildTeam == info.ID);
         else
             info.Servers = servers;
 
@@ -209,7 +209,7 @@ export default class BuildTeam {
 
         // Add regions to the build team info
 
-        info.Regions = this.network.buildTeamRegions.filter((region: any) => region.BuildTeam == info.ID);
+        info.Regions = JSON.parse(JSON.stringify(this.network.buildTeamRegions)).filter((region: any) => region.BuildTeam == info.ID);
 
         for(const region of info.Regions)
             region.BuildTeam = undefined;
@@ -217,17 +217,17 @@ export default class BuildTeam {
 
         // Add warps to the build team info
 
-        info.Warps = this.network.buildTeamWarps.filter((warp: any) => warp.BuildTeam == info.ID);
+        info.Warps = JSON.parse(JSON.stringify(this.network.buildTeamWarps)).filter((warp: any) => warp.BuildTeam == info.ID);
 
-        for(const warp of this.network.buildTeamWarps)
+        for(const warp of info.Warps)
             warp.BuildTeam = undefined;
 
 
         // Add warp groups to the build team info
 
-        info.WarpGroups = this.network.buildTeamWarpGroups.filter((warpGroup: any) => warpGroup.BuildTeam == info.ID);
+        info.WarpGroups = JSON.parse(JSON.stringify(this.network.buildTeamWarpGroups)).filter((warpGroup: any) => warpGroup.BuildTeam == info.ID);
 
-        for(const warpGroup of this.network.buildTeamWarpGroups)
+        for(const warpGroup of info.WarpGroups)
             warpGroup.BuildTeam = undefined;
         
         
