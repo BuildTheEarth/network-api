@@ -347,6 +347,7 @@ export default class BuildTeam {
         const success = await this.createWarpInDatabase(id, this.buildTeamID, warpGroupID, name, finalCountryCode, address, worldName, lat, lon, y, yaw, pitch, isHighlight);
         
         // Reset the cache to make sure the new warp is loaded
+        this.network.buildTeamWarps = null;
         this.resetCache();
 
         return success;
@@ -414,6 +415,7 @@ export default class BuildTeam {
         const success = await this.updateWarpInDatabase(ID, this.buildTeamID, warpGroupID, name, finalCountryCode, address, worldName, lat, lon, y, yaw, pitch, isHighlight);
     
         // Reset the cache to make sure the warp is reloaded
+        this.network.buildTeamWarps = null;
         this.resetCache();
 
         return success;
@@ -435,6 +437,7 @@ export default class BuildTeam {
         const success = await this.deleteWarpInDatabase(key);
 
         // Reset the cache to make sure the warp is deleted
+        this.network.buildTeamWarps = null;
         this.resetCache();
 
         return success;
@@ -497,6 +500,7 @@ export default class BuildTeam {
         const success = await this.createWarpGroupInDatabase(id, name, description);
 
         // Reset the cache to make sure the new warp group is loaded
+        this.network.buildTeamWarpGroups = null;
         this.resetCache();
 
         return success;
@@ -525,6 +529,7 @@ export default class BuildTeam {
         const success = await this.updateWarpGroupInDatabase(id, name, description);
 
         // Reset the cache to make sure the warp group is reloaded
+        this.network.buildTeamWarpGroups = null;
         this.resetCache();
 
         return success;
@@ -546,6 +551,7 @@ export default class BuildTeam {
         const success = await this.deleteWarpGroupInDatabase(key);
 
         // Reset the cache to make sure the warp group is deleted
+        this.network.buildTeamWarpGroups = null;
         this.resetCache();
 
         return success;
