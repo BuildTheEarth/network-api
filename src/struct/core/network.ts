@@ -260,6 +260,11 @@ export default class Network {
             return;
 
         this.buildTeamInfo = await this.getBuildTeamInfoFromDatabase();
+
+        if(this.buildTeamInfo.length == 0){
+            console.log("No Build Teams found in the database. Please add at least one Build Team to it.");
+            return;
+        }
     }
 
     async loadBuildTeamRegions() {
@@ -267,6 +272,11 @@ export default class Network {
             return;
 
         this.buildTeamRegions = await this.getBuildTeamRegions();
+
+        if(this.buildTeamRegions.length == 0){
+            console.log("No Build Team Regions found in the database. Please add at least one Build Team Region to it.");
+            return;
+        }
     }
 
     async loadBuildTeamServers() {
@@ -274,6 +284,11 @@ export default class Network {
             return;
 
         this.buildTeamServers = await this.getBuildTeamServersFromDatabase();
+
+        if(this.buildTeamServers.length == 0){
+            console.log("No Build Team Servers found in the database. Please add at least one Build Team Server to it.");
+            return;
+        }
     }
 
     async loadBuildTeamWarps() {
@@ -281,6 +296,11 @@ export default class Network {
             return;
 
         this.buildTeamWarps = await this.getWarpsFromDatabase();
+
+        if(this.buildTeamWarps.length == 0){
+            console.log("No Build Team Warps found in the database. Please add at least one Build Team Warp to it.");
+            return;
+        }
     }
 
     async loadBuildTeamWarpGroups() {
@@ -288,6 +308,11 @@ export default class Network {
             return;
 
         this.buildTeamWarpGroups = await this.getWarpGroupsFromDatabase();
+
+        if(this.buildTeamWarpGroups.length == 0){
+            console.log("No Build Team Warp Groups found in the database. Please add at least one Build Team Warp Group to it.");
+            return;
+        }
     }
 
 
