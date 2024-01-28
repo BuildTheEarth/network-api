@@ -343,8 +343,13 @@ export default class BuildTeam {
             if(!found)
                 return false;
         }
+
+        const success = await this.createWarpInDatabase(id, this.buildTeamID, warpGroupID, name, finalCountryCode, address, worldName, lat, lon, y, yaw, pitch, isHighlight);
         
-        return await this.createWarpInDatabase(id, this.buildTeamID, warpGroupID, name, finalCountryCode, address, worldName, lat, lon, y, yaw, pitch, isHighlight);
+        // Reset the cache to make sure the new warp is loaded
+        this.resetCache();
+
+        return success;
     }
 
 
@@ -406,7 +411,12 @@ export default class BuildTeam {
                 return false;
         }
 
-        return await this.updateWarpInDatabase(ID, this.buildTeamID, warpGroupID, name, finalCountryCode, address, worldName, lat, lon, y, yaw, pitch, isHighlight);
+        const success = await this.updateWarpInDatabase(ID, this.buildTeamID, warpGroupID, name, finalCountryCode, address, worldName, lat, lon, y, yaw, pitch, isHighlight);
+    
+        // Reset the cache to make sure the warp is reloaded
+        this.resetCache();
+
+        return success;
     }
 
 
@@ -422,7 +432,12 @@ export default class BuildTeam {
         if(this.buildTeamID == null)
             return false;
 
-        return await this.deleteWarpInDatabase(key);
+        const success = await this.deleteWarpInDatabase(key);
+
+        // Reset the cache to make sure the warp is deleted
+        this.resetCache();
+
+        return success;
     }
 
     /** Returns a list of warps based on the build team id. If no warps are found, an empty list is returned.*/
@@ -479,7 +494,12 @@ export default class BuildTeam {
         if(this.buildTeamID == null)
             return false;
         
-        return await this.createWarpGroupInDatabase(id, name, description);
+        const success = await this.createWarpGroupInDatabase(id, name, description);
+
+        // Reset the cache to make sure the new warp group is loaded
+        this.resetCache();
+
+        return success;
     }
 
 
@@ -502,7 +522,12 @@ export default class BuildTeam {
         if(!await this.warpGroupExists(id))
             return false;
 
-        return await this.updateWarpGroupInDatabase(id, name, description);
+        const success = await this.updateWarpGroupInDatabase(id, name, description);
+
+        // Reset the cache to make sure the warp group is reloaded
+        this.resetCache();
+
+        return success;
     }
 
 
@@ -518,7 +543,12 @@ export default class BuildTeam {
         if(this.buildTeamID == null)
             return false;
 
-        return await this.deleteWarpGroupInDatabase(key);
+        const success = await this.deleteWarpGroupInDatabase(key);
+
+        // Reset the cache to make sure the warp group is deleted
+        this.resetCache();
+
+        return success;
     }
 
     /** Returns a list of warp groups based on the build team id. If no warp groups are found, an empty list is returned.*/

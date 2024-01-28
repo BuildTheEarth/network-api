@@ -52,7 +52,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         const countryCode = req.body.countryCode;                                               // Country Code that matches the countryCodeType.
         const countryCodeType = req.body.countryCodeType;                                       // Country Code Type like cca2, cca3, ccn3, or cioc.
         const address = req.body.address;                                                       // The address of the warp.
-        const addressType: AddressType = convertStringToEnum(req.body.addressType);          // The type of address. (STREET, CITY, STATE, COUNTRY)
+        const addressType: AddressType = convertStringToEnum(req.body.addressType);             // The type of address. (STREET, CITY, STATE, COUNTRY)
 
         const worldName = req.body.worldName;                                                   // The name of the world the warp is in.
         const lat = req.body.lat;                                                               // The latitude of the warp.
