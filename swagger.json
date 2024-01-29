@@ -721,6 +721,11 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "The ID of the warp.",
+                        "required": false
+                    },
                     "warpGroupID": {
                         "type": "string",
                         "description": "The ID of the warp group."
