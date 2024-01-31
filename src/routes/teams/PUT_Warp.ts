@@ -1,5 +1,5 @@
 import { Router } from "express";
-import Network, { BuildTeamIdentifier } from "../../struct/core/network.js";
+import Network, { AddressType, BuildTeamIdentifier } from "../../struct/core/network.js";
 
 export async function initRoutes(app: Router, joi: any, network: Network) {
 
@@ -55,21 +55,23 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         }
 
         // Get the parameters from the request
-        let id = warp.ID;                       // The ID of the warp.
-        let warpGroupID = warp.WarpGroupID;     // The ID of the warp group.
-        let name = warp.Name;                   // The name of the warp.
-        let countryCode = warp.CountryCode;     // Country Code that matches the countryCodeType.
-        let countryCodeType = "cca3";           // Country Code Type like cca2, cca3, ccn3, or cioc.
-        let address = warp.Address;             // The address of the warp.
+    let id = warp.ID;                                                                           // The ID of the warp.
+        let warpGroupID = warp.WarpGroupID;                                                     // The ID of the warp group.
+        let name = warp.Name;                                                                   // The name of the warp.
+        let countryCode = warp.CountryCode;                                                     // Country Code that matches the countryCodeType.
+        let countryCodeType = "cca3";                                                           // Country Code Type like cca2, cca3, ccn3, or cioc.
+        let address = warp.Address;                                                             // The address of the warp.
+        let addressType: AddressType = convertStringToAddressType(req.body.addressType);        // The type of address. (BUILDING, STREET, CITY, STATE, COUNTRY, CUSTOM)
+        let material = warp.Material;                                                           // The material of the warp.
 
-        let worldName = warp.WorldName;         // The name of the world the warp is in.
-        let lat = warp.Latitude;                // The latitude of the warp.
-        let lon = warp.Longitude;               // The longitude of the warp.
-        let y = warp.Height;                    // The y coordinate of the warp.
-        let yaw = warp.Yaw;                     // The yaw of the warp.
-        let pitch = warp.Pitch;                 // The pitch of the warp.
+        let worldName = warp.WorldName;                                                         // The name of the world the warp is in.
+        let lat = warp.Latitude;                                                                // The latitude of the warp.
+        let lon = warp.Longitude;                                                               // The longitude of the warp.
+        let y = warp.Height;                                                                    // The y coordinate of the warp.
+        let yaw = warp.Yaw;                                                                     // The yaw of the warp.
+        let pitch = warp.Pitch;                                                                 // The pitch of the warp.
 
-        let isHighlight = warp.IsHighlight;   // Whether the warp is a highlight or not.
+        let isHighlight = warp.IsHighlight;                                                     // Whether the warp is a highlight or not.
 
 
         // If the parameter was specified, set it
@@ -85,6 +87,10 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
             countryCodeType = req.body.countryCodeType;
         if(req.body.address != null)
             address = req.body.address;
+        if(req.body.addressType != null)
+            addressType = req.body.addressType;
+        if(req.body.material != null)
+            material = req.body.material;
         if(req.body.worldName != null)
             worldName = req.body.worldName;
         if(req.body.lat != null)
@@ -100,9 +106,15 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         if(req.body.isHighlight != null)
             isHighlight = req.body.isHighlight;
 
+        
+        if(addressType == AddressType.CUSTOM && address == null){
+            res.status(400).send({success: false, error: 'Address must be specified when addressType is CUSTOM'});
+            return;
+        }
+
 
         // Update the warp
-        const promise = buildTeam.updateWarp(id, warpGroupID, name, countryCode, countryCodeType, address, worldName, lat, lon, y, yaw, pitch, isHighlight);
+        const promise = buildTeam.updateWarp(id, warpGroupID, name, countryCode, countryCodeType, address, addressType, material, worldName, lat, lon, y, yaw, pitch, isHighlight);
 
 
         // Wait for the promise to resolve
@@ -118,4 +130,11 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
             res.send({success: true})
         })       
     })
+
+    function convertStringToAddressType(input: string): AddressType {
+        if (input in AddressType) {
+            return AddressType[input as keyof typeof AddressType];
+        }
+        return AddressType.CITY;
+    }
 }

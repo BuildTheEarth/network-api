@@ -15,10 +15,12 @@ export enum BuildTeamIdentifier {
 }
 
 export enum AddressType {
+    BUILDING = "19",
     STREET = "17",
     CITY = "10",
     STATE = "5",
     COUNTRY = "3",
+    CUSTOM = "0"
 }
 
 export default class Network {
@@ -406,6 +408,9 @@ export default class Network {
     }
 
     async getAddressFromCoordinates(lat: number, lon: number, addressType: AddressType): Promise<string>{
+        if(addressType == null || addressType == AddressType.CUSTOM)
+            return "Unknown";
+
         // Convert the addressType to a zoom level
         let zoomLevel = addressType.valueOf();
 

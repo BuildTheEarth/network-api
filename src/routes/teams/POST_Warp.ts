@@ -25,6 +25,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
             countryCodeType: joi.string().required().valid('cca2', 'cca3', 'ccn3', 'cioc'),
             address: joi.string().optional(),
             addressType: joi.string().optional(),
+            material: joi.string().optional(),
 
             worldName: joi.string().required(),
             lat: joi.number().required(),
@@ -52,7 +53,8 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         const countryCode = req.body.countryCode;                                               // Country Code that matches the countryCodeType.
         const countryCodeType = req.body.countryCodeType;                                       // Country Code Type like cca2, cca3, ccn3, or cioc.
         const address = req.body.address;                                                       // The address of the warp.
-        const addressType: AddressType = convertStringToEnum(req.body.addressType);             // The type of address. (STREET, CITY, STATE, COUNTRY)
+        const addressType: AddressType = convertStringToAddressType(req.body.addressType);      // The type of address. (BUILDING, STREET, CITY, STATE, COUNTRY, CUSTOM)
+        const material = req.body.material;                                                     // The material of the warp.
 
         const worldName = req.body.worldName;                                                   // The name of the world the warp is in.
         const lat = req.body.lat;                                                               // The latitude of the warp.
@@ -63,8 +65,14 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
 
         const isHighlight = req.body.isHighlight;                                               // Whether the warp is a highlight or not.
 
+
+        if(addressType == AddressType.CUSTOM && address == null){
+            res.status(400).send({success: false, error: 'Address must be specified when addressType is CUSTOM'});
+            return;
+        }
+
         // Create a new warp
-        const promise = buildTeam.createWarp(id, warpGroupID, name, countryCode, countryCodeType, address, addressType, worldName, lat, lon, y, yaw, pitch, isHighlight);
+        const promise = buildTeam.createWarp(id, warpGroupID, name, countryCode, countryCodeType, address, addressType, material, worldName, lat, lon, y, yaw, pitch, isHighlight);
 
 
         // Wait for the promise to resolve
@@ -81,7 +89,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         })       
     })
 
-    function convertStringToEnum(input: string): AddressType {
+    function convertStringToAddressType(input: string): AddressType {
         if (input in AddressType) {
             return AddressType[input as keyof typeof AddressType];
         }
