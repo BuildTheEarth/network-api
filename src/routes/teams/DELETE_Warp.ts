@@ -39,6 +39,8 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
             return;
         }
 
+        console.log(`Deleting warp ${key} from team ${buildTeam.getBuildTeamID()}`);
+
 
         // Create a new warp
         const promise = buildTeam.deleteWarp(key);
