@@ -25,6 +25,8 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
             countryCode: joi.string().optional(),
             countryCodeType: joi.string().optional().valid('cca2', 'cca3', 'ccn3', 'cioc'),
             address: joi.string().optional(),
+            addressType: joi.string().optional(),
+            material: joi.string().optional(),
 
             worldName: joi.string().optional(),
             lat: joi.number().optional(),
