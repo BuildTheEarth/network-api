@@ -420,7 +420,7 @@ export default class BuildTeam {
                 return false;
         }
 
-        const success = await this.updateWarpInDatabase(ID, this.buildTeamID, warpGroupID, name, finalCountryCode, address, addressType, material, worldName, lat, lon, y, yaw, pitch, isHighlight);
+        const success = await this.updateWarpInDatabase(ID, this.buildTeamID, warpGroupID, name, finalCountryCode, address, addressType.toString(), material, worldName, lat, lon, y, yaw, pitch, isHighlight);
     
         // Reset the cache to make sure the warp is reloaded
         this.network.buildTeamWarps = null;

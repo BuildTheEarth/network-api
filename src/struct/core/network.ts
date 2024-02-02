@@ -15,12 +15,12 @@ export enum BuildTeamIdentifier {
 }
 
 export enum AddressType {
-    BUILDING = "19",
-    STREET = "17",
-    CITY = "10",
-    STATE = "5",
-    COUNTRY = "3",
-    CUSTOM = "0"
+    BUILDING,
+    STREET,
+    CITY,
+    STATE,
+    COUNTRY,
+    CUSTOM
 }
 
 export default class Network {
@@ -412,7 +412,20 @@ export default class Network {
             return "Unknown";
 
         // Convert the addressType to a zoom level
-        let zoomLevel = addressType.valueOf();
+        let zoomLevel = 10;
+
+        if(addressType == AddressType.BUILDING)
+            zoomLevel = 19;
+        else if(addressType == AddressType.STREET)
+            zoomLevel = 17;
+        else if(addressType == AddressType.CITY)
+            zoomLevel = 10;
+        else if(addressType == AddressType.STATE)
+            zoomLevel = 5;
+        else if(addressType == AddressType.COUNTRY)
+            zoomLevel = 3;
+        else if(addressType == AddressType.CUSTOM)
+            return "Unknown";
 
         // Get the address from the OpenStreetMap API
         const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=${zoomLevel}`;
