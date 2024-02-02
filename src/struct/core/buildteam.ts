@@ -348,7 +348,7 @@ export default class BuildTeam {
                 return false;
         }
 
-        const success = await this.createWarpInDatabase(id, this.buildTeamID, warpGroupID, name, finalCountryCode, address, addressType, material, worldName, lat, lon, y, yaw, pitch, isHighlight);
+        const success = await this.createWarpInDatabase(id, this.buildTeamID, warpGroupID, name, finalCountryCode, address, addressType.toString(), material, worldName, lat, lon, y, yaw, pitch, isHighlight);
         
         // Reset the cache to make sure the new warp is loaded
         this.network.buildTeamWarps = null;
