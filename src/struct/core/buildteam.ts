@@ -876,6 +876,8 @@ export default class BuildTeam {
     private async createWarpInDatabase(ID: string, buildTeamID: string, warpGroupID: string|null, name: string, countryCode: string, address: string, addressType: string, material: string, worldName: string, lat: number, lon: number, height: number, yaw: number, pitch: number, isHighlight: boolean) {
         const SQL = "INSERT INTO BuildTeamWarps (ID, BuildTeam, WarpGroup, Name, CountryCode, Address, AddressType, Material, WorldName, Latitude, Longitude, Height, Yaw, Pitch, IsHighlight) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
+        console.log("ID: " + ID + " BuildTeam: " + buildTeamID + " WarpGroup: " + warpGroupID + " Name: " + name + " CountryCode: " + countryCode + " Address: " + address + " AddressType: " + addressType + " Material: " + material + " WorldName: " + worldName + " Latitude: " + lat + " Longitude: " + lon + " Height: " + height + " Yaw: " + yaw + " Pitch: " + pitch + " IsHighlight: " + isHighlight)
+
         const result = await this.nwDatabase.query(SQL, [ID, buildTeamID, warpGroupID, name, countryCode, address, addressType, material, worldName, lat, lon, height, yaw, pitch, isHighlight]);
 
         if(result.affectedRows == 1)
