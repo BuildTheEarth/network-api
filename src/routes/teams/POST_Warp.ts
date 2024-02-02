@@ -54,7 +54,7 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         const countryCodeType = req.body.countryCodeType;                                       // Country Code Type like cca2, cca3, ccn3, or cioc.
         const address = req.body.address;                                                       // The address of the warp.
         const addressType: AddressType = convertStringToAddressType(req.body.addressType);      // The type of address. (BUILDING, STREET, CITY, STATE, COUNTRY, CUSTOM)
-        const material = req.body.material;                                                     // The material of the warp.
+        let material = req.body.material;                                                     // The material of the warp.
 
         const worldName = req.body.worldName;                                                   // The name of the world the warp is in.
         const lat = req.body.lat;                                                               // The latitude of the warp.
@@ -66,10 +66,15 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         const isHighlight = req.body.isHighlight;                                               // Whether the warp is a highlight or not.
 
 
+        // If the addressType is CUSTOM and the address is not specified, return an error
         if(addressType == AddressType.CUSTOM && address == null){
             res.status(400).send({success: false, error: 'Address must be specified when addressType is CUSTOM'});
             return;
         }
+
+        // If the material is not specified, set it to null
+        if(material == undefined)
+            material = null;
 
         // Create a new warp
         const promise = buildTeam.createWarp(id, warpGroupID, name, countryCode, countryCodeType, address, addressType, material, worldName, lat, lon, y, yaw, pitch, isHighlight);

@@ -112,6 +112,9 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
             return;
         }
 
+        if(material == undefined)
+            material = null;
+
 
         // Update the warp
         const promise = buildTeam.updateWarp(id, warpGroupID, name, countryCode, countryCodeType, address, addressType, material, worldName, lat, lon, y, yaw, pitch, isHighlight);
