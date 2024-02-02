@@ -95,6 +95,8 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
     })
 
     function convertStringToAddressType(input: string): AddressType {
+        console.log(input);
+        console.log(AddressType[input as keyof typeof AddressType].toString())
         if (input in AddressType) {
             return AddressType[input as keyof typeof AddressType];
         }
