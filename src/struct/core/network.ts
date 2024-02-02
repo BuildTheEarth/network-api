@@ -15,12 +15,12 @@ export enum BuildTeamIdentifier {
 }
 
 export enum AddressType {
-    BUILDING,
-    STREET,
-    CITY,
-    STATE,
-    COUNTRY,
-    CUSTOM
+    BUILDING = "BUILDING",
+    STREET = "STREET",
+    CITY = "CITY",
+    STATE = "STATE",
+    COUNTRY = "COUNTRY",
+    CUSTOM = "CUSTOM"
 }
 
 export default class Network {
