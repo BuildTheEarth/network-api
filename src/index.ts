@@ -188,6 +188,11 @@ router.use(helmet());
   Joi,
   network
 );
+(await import("./routes/teams/POST_Playerlist.js")).initRoutes(
+  router,
+  Joi,
+  network
+);
 
 // Init PUT Routes for the API
 (await import("./routes/teams/PUT_TeamHasBuildTeamToolsInstalled.js")).initRoutes(

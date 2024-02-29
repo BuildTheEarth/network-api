@@ -356,6 +356,60 @@
         }
       }
     },
+    "/api/teams/countries": {
+      "get": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Get Countries",
+        "description": "Get a list of all countries along with their Build Team.",
+        "responses": {
+          "400": {
+            "description": "No countries found."
+          }
+        }
+      }
+    },
+    "/api/teams/warps": {
+      "get": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Get Warps",
+        "description": "Get a list of all warps in BuildTheEarth.",
+        "parameters": [
+          {
+            "name": "country",
+            "description": "Filter the warps by country code.",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "No warps found."
+          }
+        }
+      }
+    },
+    "/api/teams/warpgroups": {
+      "get": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Get Warps",
+        "description": "Get a list of all warp groups in BuildTheEarth.",
+        "parameters": [],
+        "responses": {
+          "400": {
+            "description": "No warp groups found."
+          }
+        }
+      }
+    },
     "/api/teams/%KEY%": {
       "get": {
         "tags": [
@@ -697,7 +751,81 @@
         }
       }
     },
-      
+    "/api/teams/%KEY%/warpgroups": {
+      "get": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Get Build Team Warp Groups",
+        "description": "Returns the warp groups of a build team of BuildTheEarth.",
+        "parameters": [
+          {
+            "name": "KEY",
+            "description": "The API Key, Build Team ID, Build Team Tag, or Build Team Server of the Build Team.",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/teams/%API_KEY%/playerlist": {
+      "get": {
+        "tags": [
+          "Build Teams"
+        ],
+        "summary": "Sync Build Team Playerlist",
+        "description": "Sync the Build Team online Playerlist with the network",
+        "parameters": [
+          {
+            "name": "api_key",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "description": "The UUID of the player.",
+                        "required": false
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the player."
+                    }
+
+                },
+                "example": [
+                  ["0000000-0000-0000-0000-000000000000", "Player 1"],
+                  ["0000000-0000-0000-0000-000000000001", "Player 2"],
+                  ["0000000-0000-0000-0000-000000000002", "Player 3"]
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/teams/%API_KEY%/warps": {
       "post": {
         "tags": [
@@ -978,72 +1106,6 @@
         }
       }
     },
-    "/api/teams/countries": {
-      "get": {
-        "tags": [
-          "Build Teams"
-        ],
-        "summary": "Get Countries",
-        "description": "Get a list of all countries along with their Build Team.",
-        "responses": {
-          "400": {
-            "description": "No countries found."
-          }
-        }
-      }
-    },
-    "/api/teams/warps": {
-      "get": {
-        "tags": [
-          "Build Teams"
-        ],
-        "summary": "Get Warps",
-        "description": "Get a list of all warps in BuildTheEarth.",
-        "parameters": [
-          {
-            "name": "country",
-            "description": "Filter the warps by country code.",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            },
-            "required": false
-          }
-        ],
-        "responses": {
-          "400": {
-            "description": "No warps found."
-          }
-        }
-      }
-    },
-
-    "/api/teams/%KEY%/warpgroups": {
-      "get": {
-        "tags": [
-          "Build Teams"
-        ],
-        "summary": "Get Build Team Warp Groups",
-        "description": "Returns the warp groups of a build team of BuildTheEarth.",
-        "parameters": [
-          {
-            "name": "KEY",
-            "description": "The API Key, Build Team ID, Build Team Tag, or Build Team Server of the Build Team.",
-            "in": "path",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
-      
     "/api/teams/%API_KEY%/warpgroups": {
       "post": {
         "tags": [
@@ -1183,21 +1245,6 @@
         "responses": {
           "200": {
             "description": "Success"
-          }
-        }
-      }
-    },
-    "/api/teams/warpgroups": {
-      "get": {
-        "tags": [
-          "Build Teams"
-        ],
-        "summary": "Get Warps",
-        "description": "Get a list of all warp groups in BuildTheEarth.",
-        "parameters": [],
-        "responses": {
-          "400": {
-            "description": "No warp groups found."
           }
         }
       }

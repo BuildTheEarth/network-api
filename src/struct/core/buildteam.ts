@@ -28,12 +28,15 @@ export default class BuildTeam {
     private static readonly SERVER_UPDATE_INTERVAL: number = 60 * 24; // 24 hours
     private static readonly FTP_CONFIGURATION_UPDATE_INTERVAL: number = 60 * 24; // 24 hours
     private static readonly BUILD_TEAM_INFO_UPDATE_INTERVAL: number = 60 * 1; // 1 hour
+    private static readonly PLAYER_LIST_CLEAR_INTERVAL: number = 60 * 1; // 1 hours
 
     private apiKey: string;
     private buildTeamID: string | null = null;
     private network: Network;
     private psDatabase: DatabaseHandler
     private nwDatabase: DatabaseHandler
+    private playerList: any[] = [];
+    private lastPlayerListUpdate: Date | null = null;
 
     private psBuildTeamID: string | null = null;
     private psCities: Map<number, any[]> = new Map() // Map<country_id, city>
@@ -78,6 +81,15 @@ export default class BuildTeam {
 
         if(this.psFTPConfiguration != null && this.network.getUpdateCacheTicks() % BuildTeam.FTP_CONFIGURATION_UPDATE_INTERVAL == 0)
             this.psFTPConfiguration.clear();
+
+        // If the last player list update is older than the player list clear interval, clear the player list
+        if(this.playerList != null && this.lastPlayerListUpdate != null && this.network.getUpdateCacheTicks() % BuildTeam.PLAYER_LIST_CLEAR_INTERVAL == 0){
+            const timeDifference = (new Date().getTime() - this.lastPlayerListUpdate.getTime()) / 1000;
+            if(timeDifference > BuildTeam.PLAYER_LIST_CLEAR_INTERVAL){
+                this.playerList = [];
+                this.lastPlayerListUpdate = null;
+            }
+        }
     }
 
     // Resets the cache for the build team
@@ -87,6 +99,8 @@ export default class BuildTeam {
         this.psCountries.clear();
         this.psServers.clear();
         this.psFTPConfiguration.clear();
+        this.playerList = [];
+        this.lastPlayerListUpdate = null;
     }
 
     async loadBuildTeamData(){
@@ -590,6 +604,43 @@ export default class BuildTeam {
     async warpGroupExists(warpGroupID: string){
         const warpgroups = await this.getWarpGroups();
         return warpgroups.some((warp: any) => warp.ID == warpGroupID);
+    }
+
+
+
+    /* ======================================= */
+    /*                  Playerlist             */
+    /* ======================================= */
+
+
+    /** Updates the playerlist of the build team.
+     * 
+     * @param players The list of players
+     * 
+     * @returns Returns true if the playerlist was updated successfully, otherwise false.
+     **/
+    async updatePlayerlist(players: any[]) {
+        // Validate that the build team id is loaded
+        if(this.buildTeamID == null)
+            await this.loadBuildTeamData();
+        if(this.buildTeamID == null)
+            return false;
+
+        // Take the data that is needed for the BuildTeamOnlinePlayers table
+        const tempArray: any[] = [];
+
+        players.forEach((subArray) => {
+            tempArray.push([subArray[0], subArray[1], this.buildTeamID]);
+        });
+        
+        this.lastPlayerListUpdate = new Date();
+        this.playerList = tempArray;
+        
+        return true;
+    }
+
+    getPlayerList() {
+        return this.playerList;
     }
 
 

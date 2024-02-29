@@ -115,6 +115,8 @@ export default class Network {
             if (isStarting == true) bar?.tick();
         }
 
+        this.syncPlayerList();
+
         this.updateCacheTicks++;
 
         if(this.updateCacheTicks >= Number.MAX_SAFE_INTEGER - 100)
@@ -437,7 +439,15 @@ export default class Network {
         return json.display_name;
     }
 
+    async syncPlayerList(): Promise<number | false>{
+        let globalPlayerList: any[] = [];
 
+        // Create a two dimensional array with one array for each player
+        for (const buildTeam of this.buildTeams.values()) 
+            globalPlayerList = globalPlayerList.concat(buildTeam.getPlayerList());
+
+        return this.syncPlayerListInDatabase(globalPlayerList);
+    }
 
 
     
@@ -579,4 +589,32 @@ export default class Network {
         const SQL = "SELECT * FROM BuildTeamWarpGroups";
         return await this.networkDatabase.query(SQL);
     }
+
+
+    /* =================================================== */
+    /*              DATABASE POST REQUESTS                 */
+    /* =================================================== */
+
+    private async syncPlayerListInDatabase(playerList: any[]): Promise<number | false> {
+        try {
+            // Truncate the table first
+            await this.networkDatabase.query("TRUNCATE TABLE BuildTeamOnlinePlayers");
+    
+            // Insert new data if available
+            if (playerList && playerList.length > 0) {
+                const placeholders = playerList.map(() => "(?, ?, ?)").join(", ");
+                const flatValues = playerList.flat();
+                const insertSQL = `INSERT INTO BuildTeamOnlinePlayers (UUID, Name, BuildTeam) VALUES ${placeholders}`;
+                const insertResult = await this.networkDatabase.query(insertSQL, flatValues);
+    
+                if (insertResult.affectedRows > 0) 
+                    return insertResult.affectedRows;
+            }
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    
+        return false;
+    }   
 }
