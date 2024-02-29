@@ -777,7 +777,7 @@
       }
     },
     "/api/teams/%API_KEY%/playerlist": {
-      "get": {
+      "post": {
         "tags": [
           "Build Teams"
         ],
