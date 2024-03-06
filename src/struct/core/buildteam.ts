@@ -505,10 +505,11 @@ export default class BuildTeam {
      * @param id The ID of the warp group
      * @param name The name of the warp group
      * @param description The description of the warp group
+     * @param slot The slot of the warp group
      * 
      * @returns Returns true if the warp group was created successfully, otherwise false.
      **/
-    async createWarpGroup(id: string|null, name: string, description: string) {
+    async createWarpGroup(id: string|null, name: string, description: string, slot: number, material: string) {
         // Generate a new uuid if the id is null
         if(id == null)
             id = uuidv4();        
@@ -519,7 +520,7 @@ export default class BuildTeam {
         if(this.buildTeamID == null)
             return false;
         
-        const success = await this.createWarpGroupInDatabase(id, name, description);
+        const success = await this.createWarpGroupInDatabase(id, name, description, slot, material);
 
         // Reset the cache to make sure the new warp group is loaded
         this.network.buildTeamWarpGroups = null;
@@ -935,10 +936,10 @@ export default class BuildTeam {
             return false;
     }
 
-    private async createWarpGroupInDatabase(id: string, name: string, description: string) {
-        const SQL = "INSERT INTO BuildTeamWarpGroups (ID, BuildTeam, Name, Description) VALUES (?, ?, ?, ?)";
+    private async createWarpGroupInDatabase(id: string, name: string, description: string, slot: number, material: string) {
+        const SQL = "INSERT INTO BuildTeamWarpGroups (ID, BuildTeam, Name, Description, Slot, Material) VALUES (?, ?, ?, ?, ?, ?)";
 
-        const result = await this.nwDatabase.query(SQL, [id, this.buildTeamID, name, description]);
+        const result = await this.nwDatabase.query(SQL, [id, this.buildTeamID, name, description, slot, material]);
 
         if(result.affectedRows == 1)
             return true;

@@ -1135,14 +1135,27 @@
                     },
                     "description": {
                         "type": "string",
-                        "description": "The description of the warp group."
+                        "description": "The description of the warp group.",
+                        "required": false
+                    },
+                    "slot": {
+                        "type": "number",
+                        "description": "The slot of the warp group.",
+                        "required": false
+                    },
+                    "material": {
+                      "type": "string",
+                      "description": "The material of the warp group. It can either be a minecraft block or a custom head texture url e.g. http://textures.minecraft.net/texture/badc048a7ce78f7dad72a07da27d85c0916881e5522eeed1e3daf217a38c1a",
+                      "required": false
                     }
                 },
                 "example": [
                   {
                     "id": "cf0d3acb-e3df-4cdf-9960-d5e90aadf165",
                     "name": "My Test Warp",
-                    "description": "This is a test warp group."
+                    "description": "This is a test warp group.",
+                    "slot": 1,
+                    "material": "STONE"
                   }
                 ]
               }
