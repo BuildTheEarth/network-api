@@ -39,11 +39,15 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         const name = req.body.name;                         // The name of the warp.
         const description = req.body.description;           // The description of the warp.
         let slot = req.body.slot;                         // The slot of the warp.
-        const material = req.body.material;                 // The material of the warp.
+        let material = req.body.material;                 // The material of the warp.
 
-        // If the slot is not provided, set it to -1
-        if(slot < 0 || slot >= 27)
+        // If the slot is not provided, or is invalid, set it to -1
+        if(slot == undefined || slot < 0 || slot >= 27)
             slot = -1;
+
+        // If the material is not specified, set it to null
+        if(material == undefined)
+            material = null;
 
         // Create a new warp
         const promise = buildTeam.createWarpGroup(id, name, description, slot, material);
