@@ -1140,7 +1140,7 @@
                     },
                     "slot": {
                         "type": "number",
-                        "description": "The slot of the warp group.",
+                        "description": "The slot of the warp group between 0 and 26. If the slot is -1, the next free slot will be used.",
                         "required": false
                     },
                     "material": {

@@ -38,9 +38,12 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         const id = req.body.id;                             // The id of the warp.
         const name = req.body.name;                         // The name of the warp.
         const description = req.body.description;           // The description of the warp.
-        const slot = req.body.slot;                         // The slot of the warp.
+        let slot = req.body.slot;                         // The slot of the warp.
         const material = req.body.material;                 // The material of the warp.
 
+        // If the slot is not provided, set it to -1
+        if(slot < 0 || slot >= 27)
+            slot = -1;
 
         // Create a new warp
         const promise = buildTeam.createWarpGroup(id, name, description, slot, material);
