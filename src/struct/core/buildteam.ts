@@ -535,10 +535,12 @@ export default class BuildTeam {
      * @param id The new ID of the warp group
      * @param name The new name of the warp group
      * @param description The new description of the warp group
+     * @param slot The new slot of the warp group
+     * @param material The new material of the warp group
      * 
      * @returns Returns true if the warp was created successfully, otherwise false.
      **/
-    async updateWarpGroup(id: string, name: string, description: string) {
+    async updateWarpGroup(id: string, name: string, description: string, slot: number, material: string) {
         // Validate that the build team id is loaded
         if(this.buildTeamID == null)
             await this.loadBuildTeamData();
@@ -549,7 +551,7 @@ export default class BuildTeam {
         if(!await this.warpGroupExists(id))
             return false;
 
-        const success = await this.updateWarpGroupInDatabase(id, name, description);
+        const success = await this.updateWarpGroupInDatabase(id, name, description, slot, material);
 
         // Reset the cache to make sure the warp group is reloaded
         this.network.buildTeamWarpGroups = null;
@@ -976,10 +978,10 @@ export default class BuildTeam {
     }
 
     // Updates an existing warp group in the database
-    private async updateWarpGroupInDatabase(id: string, name: string, description: string) {
-        const SQL = "UPDATE BuildTeamWarpGroups SET ID = ?, BuildTeam = ?, Name = ?, Description = ? WHERE ID = ? AND BuildTeam = ?";
+    private async updateWarpGroupInDatabase(id: string, name: string, description: string, slot: number, material: string) {
+        const SQL = "UPDATE BuildTeamWarpGroups SET ID = ?, BuildTeam = ?, Name = ?, Description = ?, Slot = ?, Material = ? WHERE ID = ? AND BuildTeam = ?";
 
-        const result = await this.nwDatabase.query(SQL, [id, this.buildTeamID, name, description, id, this.buildTeamID]);
+        const result = await this.nwDatabase.query(SQL, [id, this.buildTeamID, name, description, slot, material, id, this.buildTeamID]);
 
         if(result.affectedRows == 1)
             return true;

@@ -20,7 +20,9 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         const schema = joi.object({
             id: joi.string().required(),
             name: joi.string().optional(),
-            description: joi.string().optional()
+            description: joi.string().optional(),
+            slot: joi.number().optional(),
+            material: joi.string().optional()
         });
 
         const validation = schema.validate(req.body);
@@ -45,6 +47,8 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
         let id = warp.ID;                       // The ID of the warp.
         let name = warp.Name;                   // The name of the warp.
         let description = warp.Description;     // The description of the warp.
+        let slot = warp.Slot;                   // The slot of the warp.
+        let material = warp.Material;           // The material of the warp.
 
         // If the parameter was specified, set it
         if(req.body.id != null)
@@ -53,10 +57,14 @@ export async function initRoutes(app: Router, joi: any, network: Network) {
             name = req.body.name;
         if(req.body.description != null)
             description = req.body.description;
+        if(req.body.slot != null)
+            slot = req.body.slot;
+        if(req.body.material != null)
+            material = req.body.material;
 
 
         // Update the warp
-        const promise = buildTeam.updateWarpGroup(id, name, description);
+        const promise = buildTeam.updateWarpGroup(id, name, description, slot, material);
 
 
         // Wait for the promise to resolve

@@ -1204,6 +1204,16 @@
                         "type": "string",
                         "description": "The description of the warp.",
                         "required": false
+                    },
+                    "slot": {
+                        "type": "number",
+                        "description": "The slot of the warp group between 0 and 26. If the slot is -1, the next free slot will be used.",
+                        "required": false
+                    },
+                    "material": {
+                      "type": "string",
+                      "description": "The material of the warp group. It can either be a minecraft block or a custom head texture url e.g. http://textures.minecraft.net/texture/badc048a7ce78f7dad72a07da27d85c0916881e5522eeed1e3daf217a38c1a",
+                      "required": false
                     }
                 },
                 "example": [
