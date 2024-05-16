@@ -21,6 +21,9 @@
     },
     {
       "name": "Build Teams"
+    },
+    {
+      "name": "Players"
     }
   ],
   "paths": {
@@ -1268,6 +1271,26 @@
         "responses": {
           "200": {
             "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/players/stats/{uuid}": {
+      "get": {
+        "tags": [
+          "Players"
+        ],
+        "summary": "Get Player Statistics",
+        "description": "Returns the statistics for a player identified by their UUID.",
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid UUID format"
+          },
+          "404": {
+            "description": "Couldn't find player statistics"
           }
         }
       }
