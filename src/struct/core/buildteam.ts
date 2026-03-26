@@ -198,14 +198,8 @@ export default class BuildTeam {
         // Check if the build team is connected to the network or not
         // If not, get the IP of the main server and switch the servers array to only contain the main server IP
         let servers = null;
-        if(info.Visibility == "OtherServer" && info.Description != null && info.Description.includes("Current IP:\\n")){
-            const server_IP = info.Description.split("Current IP:\\n")[1].split("\\n")[0];
-
-            if(server_IP != null){
-                info.MainServerIP = server_IP;
-                servers = [{"IP" : server_IP}]
-            }
-
+        if (info.Visibility == "OtherServer") {
+            servers = [{"IP" : info.MainServerIP}]
             info.isConnectedToNetwork = false;
         }else{
             info.isConnectedToNetwork = true;
