@@ -23,7 +23,7 @@
     "helmet": "^6.0.1",
     "joi": "^17.13.8",
     "json5": "^2.2.3",
-    "mariadb": "^3.0.2",
+    "mariadb": "^3.2.5",
     "progress": "^2.0.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0",
