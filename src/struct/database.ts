@@ -1,5 +1,5 @@
 import Settings from "./settings.js";
-import mariadb from "mariadb";
+import mariadb, {Pool} from "mariadb";
 
 export interface Database {
   host: string;
@@ -13,7 +13,7 @@ export interface Database {
 export default class DatabaseHandler {
   public databaseSettings!: Database;
   public settings: Settings;
-  private pool!: mariadb.Pool;
+    private pool!: Pool;
   private sqlQueryCount: number = 0;
 
   constructor(settings: Settings, databaseSettings: Database) {
