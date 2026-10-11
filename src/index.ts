@@ -1,6 +1,5 @@
 import Database from "./struct/database.js";
 import Joi from "joi";
-import PlotSystem from "./struct/core/plotsystem.js";
 import Settings from "./struct/settings.js";
 import cors from "cors";
 import express from "express";
@@ -166,6 +165,18 @@ const network = new Network(plotsystemDatabase, networkDatabase);
 // Use the body-parser middleware
 //@ts-ignore
 router.use(express.json());
+
+// Catch and handle malformed JSON syntax errors gracefully
+router.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (err instanceof SyntaxError && "status" in err && err.status === 400 && "body" in err) {
+    console.warn(`[JSON Parse Error] ${req.method} ${req.originalUrl || req.url}: ${err.message}`);
+    return res.status(400).json({
+      success: false,
+      error: "Invalid JSON payload received. Ensure the client serializes objects to JSON rather than calling toString()."
+    });
+  }
+  next(err);
+});
 // Use CORS & Helmet
 router.use(cors());
 router.use(helmet());
