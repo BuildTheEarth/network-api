@@ -1,4 +1,4 @@
-FROM node:19.4-alpine3.16
+FROM node:24.20.0-alpine3.24
 
 WORKDIR /etc/buildtheearth/plotsystem-api
 
