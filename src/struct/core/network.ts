@@ -430,9 +430,14 @@ export default class Network {
             return "Unknown";
 
         // Get the address from the OpenStreetMap API
+        // Nominatim requires a identifying User-Agent: https://operations.osmfoundation.org/policies/nominatim/
         const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=${zoomLevel}`;
 
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            headers: {
+                "User-Agent": "plotsystemapi/1.0.2 (BuildTheEarth; development@buildtheearth.net; https://github.com/BuildTheEarth/network-api)",
+            },
+        });
         const json = await response.json();
 
         // Return the address
